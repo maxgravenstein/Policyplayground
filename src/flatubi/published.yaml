@@ -1,0 +1,27 @@
+# Published totals for the baseline check (spec Section 5.2).
+# Billions of dollars unless the unit says otherwise. Fiscal and calendar
+# years differ a little; the check flags gaps above 15%, so this is enough.
+2026:
+  federal_income_tax:
+    value: 2751
+    source: "CBO, The Budget and Economic Outlook: 2026 to 2036 (Feb 2026), individual income taxes, FY2026"
+  payroll_taxes:
+    value: 1826
+    source: "CBO, Feb 2026 baseline, payroll taxes, FY2026 (includes unemployment insurance taxes and railroad retirement)"
+  social_security:
+    value: 1670
+    source: "2026 OASDI Trustees Report: cost 5.3% of GDP in 2026 (2025 actual cost $1,609B)"
+  snap:
+    value: 90
+    source: "CBPP: FY2026 SNAP spending was 10.3% (about $11B) below FY2025; CBO assumed a 6% drop"
+  eitc:
+    value: 70
+    source: "IRS EITC statistics, tax year 2024: about 24 million claims, $69.6B"
+  adults:
+    value: 270
+    unit: million people
+    source: "Census Bureau national projections, 2026 (about 344 million people, 21% under 18)"
+  children:
+    value: 73
+    unit: million people
+    source: "Census Bureau national projections, 2026"

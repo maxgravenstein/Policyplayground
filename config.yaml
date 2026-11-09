@@ -1,0 +1,52 @@
+# Flat tax + UBI microsimulation: default config.
+# Every policy number in the model comes from this file (spec Section 6).
+
+year: 2026
+scenario: steady_state        # steady_state | phase1 | custom
+
+ubi:
+  adult_annual: 15960
+  child_annual: 3000
+  min_age_adult: 18
+  phase1_min_age: 65           # used only in phase1
+  counts_as_ssi_income: false  # true: SSI counts the UBI as unearned income
+
+tax:
+  flat_rate: 0.3825
+  individual_filing: true
+  remove_payroll_tax: true
+  include_employer_health_in_base: true
+  include_retirement_contributions_in_base: true
+  # Not in the spec. If true, the employer payroll tax that the reform removes
+  # is added to wages (full pass-through to workers) and taxed at flat_rate.
+  employer_payroll_to_wages: false
+
+programs_removed: [snap, tanf, wic, housing, eitc, ctc, aca_ptc, unemployment, social_security]
+programs_kept: [medicaid, chip, ssi, medicare, school_meals]
+
+phase1:
+  social_security_offset: true
+
+corporate:
+  profit_base_billions: 1600
+  # Current-law corporate revenue for the baseline row. If empty, the model
+  # uses baseline_rate x profit_base.
+  baseline_rate: 0.21
+  baseline_revenue_billions:
+
+solver:
+  target_net_budget_billions: 0
+
+behavior:
+  enabled: false
+  elasticity_low_income: 0.25
+  elasticity_high_income: 0.5
+  high_income_threshold: 200000
+
+data:
+  # The "main" copy of enhanced_cps_2024.h5 (May 2026) has $9.3T of
+  # miscellaneous income and is not usable. Tag 1.115.3 is the newest good one.
+  repo: policyengine/policyengine-us-data
+  file: enhanced_cps_2024.h5
+  revision: "1.115.3"
+  local_dir: data

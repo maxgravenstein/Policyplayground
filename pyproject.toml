@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flatubi"
+version = "0.1.0"
+description = "Flat tax + UBI microsimulation on PolicyEngine US"
+requires-python = ">=3.11"
+dependencies = [
+    "policyengine-us==2.107.4",
+    "policyengine-core==3.34.10",
+    "huggingface_hub",
+    "pandas",
+    "numpy",
+    "matplotlib",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "nbformat", "nbclient", "ipykernel"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["slow: needs the full microdata (minutes)"]
