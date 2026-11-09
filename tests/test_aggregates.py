@@ -35,7 +35,7 @@ def test_baseline_totals_reported(scenario):
     """5.2: every total is reported with its gap. A gap does not fail the run."""
     res = saved(scenario)
     table = outputs.aggregate_checks(res)
-    expected = {"federal_income_tax", "payroll_taxes", "social_security", "snap", "eitc", "adults", "children"}
+    expected = {"federal_income_tax", "payroll_taxes", "social_security", "snap", "eitc", "adults", "children", "spm_poverty_rate"}
     assert set(table["item"]) == expected
     assert table["model"].notna().all()
     assert table["published"].notna().all()

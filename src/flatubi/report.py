@@ -41,6 +41,7 @@ LIMITS = [
     ("Employer payroll tax.", "The reform removes it, but by default the saving does not go to workers as higher pay (config: tax.employer_payroll_to_wages)."),
     ("State taxes", "stay at current law. They still use federal AGI and the federal EITC, so they do not change much. Their MTR is in the reform MTR."),
     ("Data.", "Enhanced CPS 2024 (policyengine-us-data tag 1.115.3), aged to the model year by PolicyEngine. The 'main' copy of the file on Hugging Face has $9.3T of miscellaneous income and is not used. Baseline totals differ from published totals; see the checks table."),
+    ("SPM poverty level.", "Baseline SPM poverty in PolicyEngine on this data is far above the Census rate (see the checks table): SPM resources subtract large medical and work costs. The change in poverty between baseline and reform is more reliable than the level."),
     ("Net income", "is PolicyEngine household net income plus ACA premium tax credits (cash-like). Medicaid, CHIP and Medicare are not in net income."),
 ]
 
@@ -108,10 +109,11 @@ def chart_two_series(x, a, b, xlabel, ylabel, names=("Baseline", "Reform"), ref=
         ax.set_xscale("log")
     if ref is not None:
         ax.axhline(ref[0], color=MUTED, linestyle="--", linewidth=1)
-        ax.annotate(ref[1], (0.01, ref[0]), xycoords=("axes fraction", "data"), fontsize=8, color=INK_2, xytext=(0, 3), textcoords="offset points")
+        ax.annotate(ref[1], (1.0, ref[0]), xycoords=("axes fraction", "data"), fontsize=8, color=INK_2,
+                    xytext=(4, 0), textcoords="offset points", va="center", ha="left")
     ax.set_xlabel(xlabel, color=INK_2, fontsize=9)
     ax.set_ylabel(ylabel, color=INK_2, fontsize=9)
-    ax.legend(frameon=False, fontsize=8)
+    ax.legend(frameon=False, fontsize=8, ncol=2, loc="lower left", bbox_to_anchor=(0, 1.0))
     return _fig_to_data_uri(fig)
 
 
@@ -139,8 +141,43 @@ def mtr_curve(m: pd.DataFrame, rate: float) -> str:
 # --------------------------------------------------------------------------
 
 
+INT_COLUMNS = {"decile", "quintile", "rank", "records"}
+HEADER_WORDS = {
+    "people_m": "people (m)",
+    "households_m": "households (m)",
+    "workers_m": "workers (m)",
+    "avg_change_per_household": "avg change per household ($)",
+    "avg_household_change": "avg household change ($)",
+    "avg_change": "avg change ($)",
+    "avg_baseline_net": "avg baseline net income ($)",
+    "pct_change": "change (%)",
+    "gap_pct": "gap (%)",
+    "share_pct": "share (%)",
+    "share_losing_5pct": "losing >5% (%)",
+    "share_housing": "housing (%)",
+    "share_snap": "SNAP (%)",
+    "d_ubi": "UBI ($)",
+    "d_federal_tax": "federal tax ($)",
+    "d_social_security": "Social Security ($)",
+    "d_removed_benefits": "removed benefits ($)",
+    "d_state_tax": "state tax ($)",
+    "d_other": "other ($)",
+    "change_pp": "change (pp)",
+    "poverty_change_pp": "poverty change (pp)",
+    "deep_poverty_change_pp": "deep poverty change (pp)",
+    "main_source": "main income",
+}
+
+
+def _header(col) -> str:
+    col = str(col)
+    return HEADER_WORDS.get(col, col.replace("_", " "))
+
+
 def _fmt_table(df: pd.DataFrame, money: set[str] = frozenset(), pct: set[str] = frozenset(), digits: int = 1) -> str:
     def fmt(col, v):
+        if col in INT_COLUMNS and isinstance(v, (int, float, np.number)) and not pd.isna(v):
+            return f"{int(v)}"
         if isinstance(v, (float, np.floating)):
             if np.isnan(v):
                 return ""
@@ -151,7 +188,7 @@ def _fmt_table(df: pd.DataFrame, money: set[str] = frozenset(), pct: set[str] = 
             return f"{v:,.{digits}f}"
         return html.escape(str(v))
 
-    head = "".join(f"<th>{html.escape(str(c))}</th>" for c in df.columns)
+    head = "".join(f"<th>{html.escape(_header(c))}</th>" for c in df.columns)
     rows = []
     for _, r in df.iterrows():
         cells = "".join(
@@ -181,7 +218,7 @@ th{text-align:left;color:var(--ink2);font-weight:600;padding:6px 8px;border-bott
 td{padding:5px 8px;border-bottom:1px solid var(--line)}td.num{text-align:right;white-space:nowrap}
 tr.total td{font-weight:600}
 .chart{background:#fcfcfb;border:1px solid var(--line);border-radius:8px;padding:8px;margin:8px 0}
-.chart img{width:100%;height:auto;display:block}
+.chart img{width:100%;max-width:760px;height:auto;display:block;margin:0 auto}
 .note{color:var(--ink2);font-size:13px}
 .flag{color:var(--warn);font-weight:600}
 pre{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;overflow-x:auto;font-size:12px}

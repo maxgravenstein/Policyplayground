@@ -136,3 +136,12 @@ def test_zero_rate_zero_ubi_equals_baseline_minus_removed(household):
         - sum(total(h.b, v) for v in removed_benefits)
     )
     assert total(h.r, "household_net_income") == pytest.approx(expected, abs=1)
+
+
+def test_employer_payroll_passthrough_switch(household):
+    """Optional: employer payroll tax paid out as wages and taxed (not in the spec)."""
+    h = household({"a": {"age": 30, "employment_income": 50_000}}, system="steady_state:passthrough")
+    employer = total(h.b, "employer_social_security_tax") + total(h.b, "employer_medicare_tax")
+    assert employer == pytest.approx(0.0765 * 50_000)
+    assert total(h.r, "flat_tax") == pytest.approx(RATE * (50_000 + employer))
+    assert total(h.r, "household_net_income") == pytest.approx((50_000 + employer) * (1 - RATE) + UBI_ADULT)

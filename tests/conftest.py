@@ -38,6 +38,8 @@ def _system(key: str):
         cfg["tax"]["flat_rate"] = 0.0
         cfg["ubi"]["adult_annual"] = 0
         cfg["ubi"]["child_annual"] = 0
+    if variant == "passthrough":
+        cfg["tax"]["employer_payroll_to_wages"] = True
     if variant == "ssi_counts":
         cfg["ubi"]["counts_as_ssi_income"] = True
     return build_reform(resolve(cfg, scenario))(CountryTaxBenefitSystem())

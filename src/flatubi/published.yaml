@@ -25,3 +25,7 @@
     value: 73
     unit: million people
     source: "Census Bureau national projections, 2026"
+  spm_poverty_rate:
+    value: 13.1
+    unit: "% of people"
+    source: "Census Bureau, Poverty in the United States: 2025 (P60-290, Sept 2026), SPM rate for 2025"

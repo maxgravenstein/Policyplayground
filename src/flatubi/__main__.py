@@ -24,12 +24,30 @@ def _log(msg: str) -> None:
     print(msg, flush=True)
 
 
+def out_dir_for(cfg: dict, scenario: str | None) -> Path:
+    """outputs/<scenario>_<year>/, or outputs/<output_name>/ if the config sets it."""
+    scen = scenario or cfg.get("scenario", "steady_state")
+    name = cfg.get("output_name") or f"{scen}_{cfg.get('year', 2026)}"
+    return ROOT / "outputs" / name
+
+
 def _run(cfg_path: str, scenario: str | None, mtr: bool):
-    from flatubi import outputs, report, solver
     from flatubi import run as runmod
 
     cfg = load_config(cfg_path)
     res = runmod.run(cfg, scenario=scenario, mtr=mtr, log=_log)
+    out_dir = out_dir_for(cfg, res.policy.scenario)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    with open(out_dir / "result.pkl", "wb") as f:
+        pickle.dump(res, f)
+    tables, solve, path = _finish(res, out_dir)
+    return res, tables, solve, path
+
+
+def _finish(res, out_dir):
+    """Tables, solver and report from a finished run (no simulation)."""
+    from flatubi import outputs, report, solver
+
     tables = outputs.all_tables(res)
     solve = solver.solve_rate(res)
     if solve.converged:
@@ -38,11 +56,8 @@ def _run(cfg_path: str, scenario: str | None, mtr: bool):
         tables["distribution_decile_at_solved_rate"] = outputs.distribution_by_decile(h)
         tables["losers_at_solved_rate"] = outputs.biggest_losers(h)
         tables["budget_at_solved_rate"] = outputs.budget_table(at)
-    out_dir = ROOT / "outputs" / f"{res.policy.scenario}_{res.policy.year}"
     path = report.write_outputs(res, tables, solve, out_dir)
-    with open(out_dir / "result.pkl", "wb") as f:
-        pickle.dump(res, f)
-    return res, tables, solve, path
+    return tables, solve, path
 
 
 def cmd_run(args) -> int:
@@ -60,8 +75,7 @@ def cmd_run(args) -> int:
 
 def _load_or_run(cfg_path: str, scenario: str | None):
     cfg = load_config(cfg_path)
-    scen = scenario or cfg.get("scenario", "steady_state")
-    pkl = ROOT / "outputs" / f"{scen}_{cfg.get('year', 2026)}" / "result.pkl"
+    pkl = out_dir_for(cfg, scenario) / "result.pkl"
     if pkl.exists():
         with open(pkl, "rb") as f:
             res = pickle.load(f)
@@ -72,6 +86,20 @@ def _load_or_run(cfg_path: str, scenario: str | None):
     from flatubi import run as runmod
 
     return runmod.run(cfg, scenario=scenario, mtr=False, log=_log)
+
+
+def cmd_report(args) -> int:
+    cfg = load_config(args.config)
+    out_dir = out_dir_for(cfg, args.scenario)
+    with open(out_dir / "result.pkl", "rb") as f:
+        res = pickle.load(f)
+    flat = res.policy.flat_rate
+    res.policy.raw = cfg
+    if float(cfg["tax"]["flat_rate"]) != flat:
+        _log(f"Note: the saved run used flat_rate {flat}; the config now says {cfg['tax']['flat_rate']}.")
+    _, solve, path = _finish(res, out_dir)
+    _log(f"Report: {path}")
+    return 0
 
 
 def cmd_solve(args) -> int:
@@ -145,6 +173,10 @@ def main(argv=None) -> int:
     c = sub.add_parser("compare", help="compare several configs")
     c.add_argument("--configs", nargs="+", required=True)
     c.set_defaults(fn=cmd_compare)
+    rp = sub.add_parser("report", help="rebuild tables and report.html from the saved run")
+    rp.add_argument("--config", default="config.yaml")
+    rp.add_argument("--scenario", choices=["steady_state", "phase1", "custom"])
+    rp.set_defaults(fn=cmd_report)
     b = sub.add_parser("baseline-check", help="print baseline totals against published totals")
     b.add_argument("--config", default="config.yaml")
     b.set_defaults(fn=cmd_baseline)

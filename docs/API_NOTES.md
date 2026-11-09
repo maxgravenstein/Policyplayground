@@ -46,8 +46,13 @@ sim.calculate("household_net_income", 2026)                 # weighted MicroSeri
 sim.calculate("income_tax", 2026, map_to="household")         # sum to households
 ```
 
-About 4 minutes for the first full calculation on 4 CPUs, about 5-6 GB RAM.
-`marginal_tax_rate` adds one more branch (several minutes).
+About 4 minutes for the first full calculation on 4 CPUs, 6-8 GB RAM.
+
+**Do not call `marginal_tax_rate` on the full data on a 15 GB machine.** It copies
+the simulation into a branch and the process is killed for lack of memory. We
+compute the MTR with a second simulation instead (`flatubi.run.add_mtr`): set
+`employment_income_before_lsr` to wages + $1,000 for every worker with
+`sim.set_input(...)` before any calculation, and compare household net income.
 
 ## (b) Apply a reform from a parameter dictionary
 
@@ -132,9 +137,18 @@ Simulation(situation=situation, tax_benefit_system=tbs)
   `spm_calculator` package) counts as an adult, and `person_in_poverty` then stops
   with `SPMInputError`. `flatubi/reform/datafix.py` sets the adult count to at
   least 1. The same fix runs in baseline and reform.
-* `marginal_tax_rate` is measured only for the adults with the highest market
-  income in each household (`marginal_tax_rate_computed`). It uses
-  `household_net_income`, so it includes state taxes and benefit phase-outs, but
+* PolicyEngine's `marginal_tax_rate` is measured only for the adults with the
+  highest market income in each household (`marginal_tax_rate_computed`). Our own
+  MTR is per household (all workers bumped at once). Both use
+  `household_net_income`, so they include state taxes and benefit phase-outs, but
   not Medicaid.
+* Baseline SPM poverty on this data is 23.7% for 2026, against 13.1% from the
+  Census for 2025. SPM thresholds look right (median $44,600 for 4 people); the
+  gap is in resources: `spm_unit_net_income` ($12.8T) is about $1.2T below market
+  income + benefits - taxes - child care, which points to large medical
+  out-of-pocket costs. We report the level as a flagged gap and use the change.
+* Baseline totals against published totals: income tax -21% (low
+  partnership/S-corp income in this file), SNAP +27%, housing assistance $172B
+  (HUD rental aid is nearer $60B), SSI $9B (about $60B in reality).
 * Neutralizing an input variable prints a warning each time a situation sets it.
   That is expected.

@@ -1,0 +1,23 @@
+{
+  "scenario": "steady_state",
+  "year": 2026,
+  "flat_rate": 0.3825,
+  "revenue_neutral_rate": 0.3560905456542969,
+  "solver_converged": true,
+  "net_budget_billions": 491.0,
+  "net_transfer_billions": 2008.7,
+  "meta": {
+    "versions": {
+      "policyengine-us": "2.107.4",
+      "policyengine-core": "3.34.10",
+      "policyengine-us-data": "1.89.0",
+      "flatubi": "0.1.0"
+    },
+    "dataset": "data/ecps_1.115.3/enhanced_cps_2024.h5",
+    "data_revision": "1.115.3",
+    "data_year": 2024,
+    "year": 2026,
+    "seconds": 781,
+    "mtr": true
+  }
+}

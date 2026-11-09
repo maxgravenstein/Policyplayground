@@ -577,6 +577,7 @@ def aggregate_checks(res: RunResult) -> pd.DataFrame:
         "eitc": _total(b, "eitc") / BILLION,
         "adults": float((p.weight * (p.age >= 18)).sum() / 1e6),
         "children": float((p.weight * (p.age < 18)).sum() / 1e6),
+        "spm_poverty_rate": float(100 * (p.weight * (p.person_in_poverty > 0)).sum() / p.weight.sum()),
     }
     rows = []
     for key, value in model.items():
