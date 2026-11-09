@@ -55,9 +55,10 @@ python -m flatubi run --config config.yaml --no-mtr         # faster, no MTR tab
 python -m flatubi solve-rate --config config.yaml           # uses the saved run
 python -m flatubi compare --configs a.yaml b.yaml
 python -m flatubi baseline-check --config config.yaml       # 5.2 totals only
+python -m flatubi report --scenario phase1                  # rebuild report from the saved run
 ```
 
-A run takes 15 to 25 minutes on 4 CPUs (the baseline part is cached after the
+A run takes about 15 minutes on 4 CPUs (9 with `--no-mtr`) (the baseline part is cached after the
 first run). Each run writes `outputs/<scenario>_<year>/`:
 
 | File | What |
@@ -72,13 +73,18 @@ first run). Each run writes `outputs/<scenario>_<year>/`:
 | `aggregate_checks.csv`, `reform_checks.csv` | Spec 5.2 and 5.3 checks |
 | `summary.json` | Key numbers |
 
+`configs/` holds the extra runs used in the summary: each scenario at its
+revenue-neutral rate, and each scenario with the employer payroll tax paid out
+as wages. Set `output_name` in a config to write to `outputs/<output_name>/`.
+
 The notebook [`notebooks/explore.ipynb`](notebooks/explore.ipynb) loads a
 config, runs it and shows the main tables.
 
 ## Tests
 
 ```bash
-pytest tests/test_households.py          # 12 single-household tests, about 4 minutes
+pytest tests/test_households.py          # 13 single-household tests, about 5 minutes
+pytest tests/test_outputs.py             # output tables on a made-up population, 2 seconds
 pytest tests/test_aggregates.py          # uses the saved runs in outputs/
 FLATUBI_FULL=1 pytest tests/test_aggregates.py   # also the zero-rate check (one more full run)
 ```

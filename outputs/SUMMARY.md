@@ -103,7 +103,17 @@ not reach anyone in the model, so it lowers revenue without raising any
 household's income. With `tax.employer_payroll_to_wages: true`, the saving is
 paid out as wages and taxed. See `*_payroll_to_wages/`.
 
-PASSTHROUGH_RESULTS
+| | Steady state | Phase 1 |
+|---|---|---|
+| Revenue-neutral rate, default (no pass-through) | 35.61% | 22.77% |
+| Revenue-neutral rate, with pass-through | **34.18%** | **21.93%** |
+| Change in net income at that rate, deciles 1-6 | +0% to +195% | -10% to +26% |
+| Change in net income at that rate, deciles 7-10 | -1% to -6% | -4% to +8% |
+
+With pass-through, the steady state is close to neutral for the middle of the
+distribution, and the losses at the top fall from 7-12% to 1-6%. Phase 1 still
+makes most deciles worse off. (Poverty in these folders is at 38.25%, the run
+rate.)
 
 ## Baseline checks and limits
 
