@@ -14,7 +14,6 @@ from policyengine_us.model_api import (
 )
 
 from flatubi.config import Policy
-from flatubi.reform.credits import ctc_against_tax
 
 # Taxes that the flat tax replaces. Set to true in the reform.
 ABOLISH_PARAMETERS = [
@@ -128,71 +127,11 @@ def make_variables(policy: Policy) -> list[type[Variable]]:
             share = max_(income, 0) / max_(person.tax_unit.project(unit_positive), 1e-9)
             return rate * max_(person.tax_unit.project(unit_income), 0) * share
 
-    keep_eitc = "eitc" in policy.kept_credits
-    keep_ctc = "ctc" in policy.kept_credits
-
-    class flatubi_flat_tax_gross(Variable):
-        """Tax-unit total of flatubi_flat_tax, before any credit."""
-
-        value_type = float
-        entity = TaxUnit
-        definition_period = YEAR
-        unit = USD
-        label = "Flat tax before credits"
-
-        def formula(tax_unit, period, parameters):
-            return add(tax_unit, period, ["flatubi_flat_tax"])
-
-    class flatubi_eitc(Variable):
-        """Federal EITC kept against the flat tax (phase 1, user decision).
-
-        Spec 2.5 phase1: working-age adults keep current programs. The EITC is
-        kept at its current-law amount (same AGI, phase-in and phase-out) and
-        is fully refundable, as today. Zero when `eitc` is removed.
-        """
-
-        value_type = float
-        entity = TaxUnit
-        definition_period = YEAR
-        unit = USD
-        label = "EITC kept against the flat tax"
-
-        def formula(tax_unit, period, parameters):
-            eitc = tax_unit("eitc", period)
-            return eitc if keep_eitc else 0 * eitc
-
-    class flatubi_ctc(Variable):
-        """Federal CTC kept against the flat tax (phase 1, user decision).
-
-        Current-law CTC amount and phase-out. The non-refundable part reduces
-        the flat tax (not the abolished income tax), and the refundable part
-        follows the current ACTC rule. See reform/credits.py.
-        """
-
-        value_type = float
-        entity = TaxUnit
-        definition_period = YEAR
-        unit = USD
-        label = "CTC kept against the flat tax"
-
-        def formula(tax_unit, period, parameters):
-            ctc = tax_unit("ctc", period)
-            if not keep_ctc:
-                return 0 * ctc
-            return ctc_against_tax(
-                ctc,
-                tax_unit("ctc_refundable_maximum", period),
-                tax_unit("ctc_phase_in", period),
-                tax_unit("flatubi_flat_tax_gross", period),
-            )
-
     class flat_tax(Variable):
-        """Flat tax of the tax unit after kept credits (can be below zero).
+        """Tax-unit total of flatubi_flat_tax.
 
-        = flatubi_flat_tax_gross - flatubi_eitc - flatubi_ctc. Without kept
-        credits this is the plain sum of flatubi_flat_tax. PolicyEngine
-        subtracts `flat_tax` in household net income and in SPM resources, so
-        the flat tax and the credits reach poverty and net income results.
+        PolicyEngine subtracts `flat_tax` in household net income and in SPM
+        resources, so the flat tax reaches poverty and net income results.
         """
 
         value_type = float
@@ -202,18 +141,9 @@ def make_variables(policy: Policy) -> list[type[Variable]]:
         label = "Flat tax"
 
         def formula(tax_unit, period, parameters):
-            gross = tax_unit("flatubi_flat_tax_gross", period)
-            return gross - tax_unit("flatubi_eitc", period) - tax_unit("flatubi_ctc", period)
+            return add(tax_unit, period, ["flatubi_flat_tax"])
 
-    variables = [
-        flatubi_payroll_passthrough,
-        flatubi_broad_income,
-        flatubi_flat_tax,
-        flatubi_flat_tax_gross,
-        flatubi_eitc,
-        flatubi_ctc,
-        flat_tax,
-    ]
+    variables = [flatubi_payroll_passthrough, flatubi_broad_income, flatubi_flat_tax, flat_tax]
 
     if policy.employer_payroll_to_wages and policy.remove_payroll_tax:
 

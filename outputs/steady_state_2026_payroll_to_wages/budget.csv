@@ -19,7 +19,7 @@ Spending,School meals,35.0,35.4,0.4
 Total,Total revenue,4223.9,7408.1,3184.2
 Total,Total spending,4109.3,6505.3,2396.0
 Total,Net budget effect (revenue minus spending),114.6,902.8,788.2
-Memo,EITC (baseline: inside income tax; reform: against flat tax),72.3,0.0,-72.3
-Memo,CTC (baseline: inside income tax; reform: against flat tax),142.4,0.0,-142.4
+Memo,EITC (inside federal income tax),72.3,0.0,-72.3
+Memo,CTC (inside federal income tax),142.4,0.0,-142.4
 Memo,State and local income tax (not in net budget),504.1,502.8,-1.3
 Memo,"Net transfer: UBI minus flat tax, where positive",0.0,1974.2,1974.2

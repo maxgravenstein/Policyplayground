@@ -259,7 +259,7 @@ def render_html(res, tables, solve) -> str:
     label = " (with rough behavior adjustment)" if behavior else ""
     scen_txt = {
         "steady_state": "Steady state: UBI for all ages, flat tax, programs removed, Social Security removed.",
-        "phase1": f"Phase 1: UBI for children and people {pol.ubi_min_age}+, Social Security offset (max of SS and UBI), working-age programs kept" + (f" (with the federal {' and '.join(c.upper() for c in pol.kept_credits)}, paid against the flat tax)" if pol.kept_credits else "") + ", flat tax for all.",
+        "phase1": f"Phase 1: UBI for children and people {pol.ubi_min_age}+, Social Security offset (max of SS and UBI), working-age programs kept, flat tax for all.",
         "custom": "Custom: every switch as set in the config.",
     }[pol.scenario]
 

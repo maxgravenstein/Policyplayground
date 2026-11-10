@@ -130,16 +130,3 @@ def test_report_renders(res, tmp_path):
     text = path.read_text()
     assert "Limits" in text and "Revenue-neutral" in text
     assert (tmp_path / "budget.csv").exists()
-
-
-def test_ctc_against_tax_rules():
-    from flatubi.reform.credits import ctc_against_tax
-
-    # Large tax: full credit.
-    assert ctc_against_tax([4400], [3400], [2625], [7650])[0] == 4400
-    # No tax, no earnings: nothing.
-    assert ctc_against_tax([4400], [3400], [0], [0])[0] == 0
-    # No tax, some earnings: refundable part only, capped by the phase-in.
-    assert ctc_against_tax([4400], [3400], [1500], [0])[0] == 1500
-    # Small tax: tax used first, then the refundable part.
-    assert ctc_against_tax([4400], [3400], [2625], [1000])[0] == 1000 + 2625

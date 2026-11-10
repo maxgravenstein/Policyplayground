@@ -145,38 +145,3 @@ def test_employer_payroll_passthrough_switch(household):
     assert employer == pytest.approx(0.0765 * 50_000)
     assert total(h.r, "flat_tax") == pytest.approx(RATE * (50_000 + employer))
     assert total(h.r, "household_net_income") == pytest.approx((50_000 + employer) * (1 - RATE) + UBI_ADULT)
-
-
-def test_phase1_keeps_eitc_and_ctc(household):
-    """Phase 1 (user decision): working-age adults keep the federal EITC and
-    CTC, paid against the flat tax with current-law rules."""
-    people = {"p": {"age": 25, "employment_income": 20_000}, "c1": {"age": 4}, "c2": {"age": 7}}
-    h = household(people, system="phase1")
-    eitc_b = total(h.b, "eitc")
-    ctc_b = total(h.b, "ctc")
-    assert eitc_b > 0 and ctc_b > 0
-    # Same EITC as today; full CTC, because the flat tax is above the
-    # non-refundable part.
-    assert total(h.r, "flatubi_eitc") == pytest.approx(eitc_b)
-    assert total(h.r, "flatubi_ctc") == pytest.approx(ctc_b)
-    gross = RATE * 20_000
-    assert total(h.r, "flatubi_flat_tax_gross") == pytest.approx(gross)
-    assert total(h.r, "flat_tax") == pytest.approx(gross - eitc_b - ctc_b)
-    assert total(h.r, "basic_income") == pytest.approx(2 * UBI_CHILD)  # parent is under 65
-    # Net income = wages - flat tax after credits + benefits (UBI, kept SNAP).
-    expected = 20_000 - total(h.r, "flat_tax") + total(h.r, "household_benefits")
-    assert total(h.r, "household_net_income") == pytest.approx(expected)
-
-
-def test_phase1_no_earnings_no_ctc(household):
-    """No earnings and no flat tax: no CTC, as under current law."""
-    h = household({"p": {"age": 30}, "c": {"age": 3}}, system="phase1")
-    assert total(h.r, "flatubi_ctc") == 0
-    assert total(h.r, "flatubi_eitc") == 0
-
-
-def test_steady_state_has_no_credits(household):
-    h = household({"p": {"age": 25, "employment_income": 20_000}, "c1": {"age": 4}}, system="steady_state")
-    assert total(h.r, "flatubi_eitc") == 0
-    assert total(h.r, "flatubi_ctc") == 0
-    assert total(h.r, "flat_tax") == pytest.approx(RATE * 20_000)

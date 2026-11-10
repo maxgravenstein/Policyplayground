@@ -31,10 +31,7 @@ Every number is in [`config.yaml`](config.yaml).
 * `steady_state`: the full system.
 * `phase1`: UBI only for children and people 65+. Social Security is kept and
   offset: each beneficiary 65+ gets max(Social Security, UBI). Working-age
-  adults keep SNAP, TANF, WIC, housing, UI and ACA credits, and the federal
-  EITC and CTC (`phase1.keep_eitc_ctc`). The two credits are paid against the
-  flat tax with current-law rules: the EITC in full; the CTC first reduces the
-  flat tax, then its refundable part follows today's formula. Flat tax for all.
+  adults keep SNAP, TANF, WIC, housing, UI and ACA credits. Flat tax for all.
 * `custom`: every switch exactly as in the config. Add `custom: {ubi_min_age: 65}`
   for an age limit.
 

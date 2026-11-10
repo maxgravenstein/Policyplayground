@@ -13,7 +13,6 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from flatubi.reform.credits import ctc_against_tax
 from flatubi.run import RunResult
 
 BILLION = 1e9
@@ -78,33 +77,6 @@ def flat_tax_revenue(res: RunResult, rate: float, behavior: bool | None = None) 
     return rate * flat_tax_base(res)  # pooled units: no behavior adjustment
 
 
-def credits_at_rate(res: RunResult, rate: float) -> pd.DataFrame | None:
-    """Kept EITC and CTC per tax unit at `rate` (phase 1), else None.
-
-    The EITC does not depend on the rate. The CTC does: its non-refundable
-    part is limited by the flat tax, which moves with the rate.
-    """
-    tu = getattr(res.reform, "tax_unit", None)
-    kept = res.policy.kept_credits
-    if tu is None or not kept:
-        return None
-    r0 = res.policy.flat_rate
-    gross = tu.flatubi_flat_tax_gross * (rate / r0) if r0 > 0 else tu.flatubi_flat_tax_gross * 0
-    out = pd.DataFrame({"household_id": tu.household_id, "weight": tu.weight, "gross": gross})
-    out["eitc"] = tu.flatubi_eitc if "eitc" in kept else 0.0
-    out["ctc"] = (
-        ctc_against_tax(tu.ctc, tu.ctc_refundable_maximum, tu.ctc_phase_in, gross) if "ctc" in kept else 0.0
-    )
-    return out
-
-
-def kept_credits_total(res: RunResult, rate: float) -> float:
-    c = credits_at_rate(res, rate)
-    if c is None:
-        return 0.0
-    return float((c.weight * (c.eitc + c.ctc)).sum())
-
-
 def with_rate(res: RunResult, rate: float) -> RunResult:
     """A copy of the result with the flat tax recomputed at `rate`.
 
@@ -118,25 +90,12 @@ def with_rate(res: RunResult, rate: float) -> RunResult:
     scale = rate / r0 if r0 > 0 else None
     hh = res.reform.household.copy()
     pp = res.reform.person.copy()
-    gross_hh = hh.flatubi_flat_tax  # household sum of person flat tax, before credits
-    new_gross_hh = gross_hh * scale if scale is not None else rate * hh.flatubi_broad_income.clip(lower=0)
+    new_hh_tax = hh.flat_tax * scale if scale is not None else rate * hh.flatubi_broad_income.clip(lower=0)
     new_p_tax = pp.flatubi_flat_tax * scale if scale is not None else rate * pp.flatubi_broad_income.clip(lower=0)
-    credits = credits_at_rate(res, rate)
-    if credits is not None:
-        per_hh = (credits.eitc + credits.ctc).groupby(credits.household_id).sum()
-        new_credits_hh = hh.household_id.map(per_hh).fillna(0).to_numpy()
-        new_hh_tax = new_gross_hh - new_credits_hh
-        tu = res.reform.tax_unit.copy()
-        tu["flatubi_flat_tax_gross"] = credits.gross.to_numpy()
-        tu["flatubi_ctc"] = credits.ctc.to_numpy()
-        out.reform.tax_unit = tu
-        hh["flatubi_ctc"] = hh.household_id.map(credits.ctc.groupby(credits.household_id).sum()).fillna(0).to_numpy()
-    else:
-        new_hh_tax = new_gross_hh - (hh.flatubi_flat_tax - hh.flat_tax)
     hh["household_net_income"] = hh.household_net_income - (new_hh_tax - hh.flat_tax)
     hh["household_tax"] = hh.household_tax + (new_hh_tax - hh.flat_tax)
     hh["flat_tax"] = new_hh_tax
-    hh["flatubi_flat_tax"] = new_gross_hh
+    hh["flatubi_flat_tax"] = new_hh_tax
     pp["flatubi_flat_tax"] = new_p_tax
     out.reform.household = hh
     out.reform.person = pp
@@ -177,12 +136,8 @@ def budget_table(res: RunResult) -> pd.DataFrame:
         ("Revenue", "Federal income tax", _total(b, "income_tax"), _total(r, "income_tax")),
         ("Revenue", "Payroll taxes (employee, employer, self-employment)", _total(b, FEDERAL_PAYROLL + EMPLOYER_PAYROLL), payroll_r),
         ("Revenue", "Flat tax", 0.0, flat_r),
+        ("Revenue", "Corporate tax (outside the microsimulation)", corp_b, corp_r),
     ]
-    kept = kept_credits_total(res, pol.flat_rate)
-    if pol.kept_credits:
-        names = " and ".join(c.upper() for c in pol.kept_credits)
-        rows.append(("Revenue", f"Minus {names} paid against the flat tax", 0.0, -kept))
-    rows.append(("Revenue", "Corporate tax (outside the microsimulation)", corp_b, corp_r))
     spending = [
         ("UBI (gross)", "basic_income"),
         ("SNAP", "snap"),
@@ -208,12 +163,10 @@ def budget_table(res: RunResult) -> pd.DataFrame:
         ("Total", "Total spending", spend.baseline, spend.reform),
         ("Total", "Net budget effect (revenue minus spending)", rev.baseline - spend.baseline, rev.reform - spend.reform),
     ]
-    credits = credits_at_rate(res, pol.flat_rate)
-    eitc_r = float((credits.weight * credits.eitc).sum()) if credits is not None else 0.0
-    ctc_r = float((credits.weight * credits.ctc).sum()) if credits is not None else 0.0
+    eitc_r = 0.0  # federal income tax is abolished in every scenario
     memo = [
-        ("Memo", "EITC (baseline: inside income tax; reform: against flat tax)", _total(b, "eitc"), eitc_r),
-        ("Memo", "CTC (baseline: inside income tax; reform: against flat tax)", _total(b, "ctc"), ctc_r),
+        ("Memo", "EITC (inside federal income tax)", _total(b, "eitc"), eitc_r),
+        ("Memo", "CTC (inside federal income tax)", _total(b, "ctc"), 0.0),
         ("Memo", "State and local income tax (not in net budget)", _total(b, "household_state_income_tax"), _total(r, "household_state_income_tax")),
         ("Memo", "Net transfer: UBI minus flat tax, where positive", 0.0, net_transfer(res)),
     ]
@@ -235,8 +188,7 @@ def net_budget_effect(res: RunResult, rate: float | None = None) -> float:
     corp_base = float(c.get("profit_base_billions", 1600))
     d_flat = (flat_tax_revenue(res, rate) - flat_tax_revenue(res, r0)) / BILLION
     d_corp = (rate - r0) * corp_base
-    d_credits = (kept_credits_total(res, rate) - kept_credits_total(res, r0)) / BILLION
-    return float(base_effect + d_flat + d_corp - d_credits)
+    return float(base_effect + d_flat + d_corp)
 
 
 def net_transfer(res: RunResult) -> float:

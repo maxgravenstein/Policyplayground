@@ -14,7 +14,7 @@ ubi:
   counts_as_ssi_income: false  # true: SSI counts the UBI as unearned income
 
 tax:
-  flat_rate: 0.2379
+  flat_rate: 0.2277
   individual_filing: true
   remove_payroll_tax: true
   include_employer_health_in_base: true
@@ -28,7 +28,6 @@ programs_kept: [medicaid, chip, ssi, medicare, school_meals]
 
 phase1:
   social_security_offset: true
-  keep_eitc_ctc: true          # federal EITC and CTC kept, paid against the flat tax
 
 corporate:
   profit_base_billions: 1600

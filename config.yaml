@@ -26,7 +26,6 @@ programs_kept: [medicaid, chip, ssi, medicare, school_meals]
 
 phase1:
   social_security_offset: true
-  keep_eitc_ctc: true          # federal EITC and CTC kept, paid against the flat tax
 
 corporate:
   profit_base_billions: 1600

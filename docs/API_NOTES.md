@@ -111,22 +111,6 @@ Simulation(situation=situation, tax_benefit_system=tbs)
 * Employer payroll taxes are not in household net income. The budget table counts
   them; in the reform they are 0.
 
-## EITC and CTC kept in phase 1
-
-* With `abolish_federal_income_tax`, PolicyEngine still computes `eitc`, `ctc`,
-  `ctc_refundable_maximum` and `ctc_phase_in` (AGI is still computed), but pays
-  none of them.
-* `refundable_ctc` limits the refundable part by `ctc_limiting_tax_liability`,
-  which is the current-law income tax. In the reform that tax does not exist, so
-  we do not use `refundable_ctc`. `flatubi/reform/credits.py` applies the same
-  rule with the flat tax as the liability:
-  used = min(ctc, flat tax); refundable = min(refundable maximum, min(ctc, flat
-  tax + phase-in) - used).
-* `flat_tax` (tax unit) = flat tax before credits - `flatubi_eitc` - `flatubi_ctc`.
-  It can be below zero (a net refund). Net income and SPM resources use it.
-* The solver recomputes the CTC at each rate from a saved tax-unit table,
-  because the non-refundable part depends on the flat tax.
-
 ## How programs count the UBI (spec 5.1, SSI test)
 
 * `basic_income` is added to AGI, to Medicaid MAGI and to some MAGI tests only if

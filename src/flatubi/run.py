@@ -74,16 +74,7 @@ PERSON_VARIABLES = [
     "market_income",
 ]
 REFORM_PERSON_VARIABLES = ["flatubi_ubi", "flatubi_broad_income", "flatubi_flat_tax"]
-REFORM_HOUSEHOLD_VARIABLES = ["flatubi_broad_income", "flatubi_flat_tax", "flatubi_eitc", "flatubi_ctc"]
-# Tax-unit values the solver needs to recompute kept credits at a new rate.
-REFORM_TAX_UNIT_VARIABLES = [
-    "flatubi_flat_tax_gross",
-    "flatubi_eitc",
-    "flatubi_ctc",
-    "ctc",
-    "ctc_refundable_maximum",
-    "ctc_phase_in",
-]
+REFORM_HOUSEHOLD_VARIABLES = ["flatubi_broad_income", "flatubi_flat_tax"]
 
 
 @dataclass
@@ -93,7 +84,6 @@ class SimResult:
     person: pd.DataFrame
     household: pd.DataFrame
     meta: dict[str, Any] = field(default_factory=dict)
-    tax_unit: pd.DataFrame | None = None  # reform only
 
 
 @dataclass
@@ -157,18 +147,7 @@ def extract(sim, year: int, reform: bool, log=print) -> SimResult:
     for name in pnames:
         person[name] = _calc(sim, name, year, map_to="person")
     log(f"    done in {time.time() - t0:.0f}s")
-    tax_unit = None
-    if reform:
-        tu = {"weight": _calc(sim, "tax_unit_weight", year)}
-        for name in REFORM_TAX_UNIT_VARIABLES:
-            tu[name] = _calc(sim, name, year)
-        # Household of each tax unit, from its first member.
-        p_tu = _calc(sim, "person_tax_unit_id", year)
-        tu_ids = _calc(sim, "tax_unit_id", year)
-        first = pd.Series(person["household_id"]).groupby(p_tu).first()
-        tu["household_id"] = first.reindex(tu_ids).to_numpy()
-        tax_unit = pd.DataFrame(tu)
-    return SimResult(pd.DataFrame(person), pd.DataFrame(hh), {"seconds": time.time() - t0}, tax_unit)
+    return SimResult(pd.DataFrame(person), pd.DataFrame(hh), {"seconds": time.time() - t0})
 
 
 MTR_DELTA = 1_000.0
