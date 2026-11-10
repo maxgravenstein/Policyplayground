@@ -12,7 +12,8 @@ REMOVED_PROGRAM_VARIABLES = {
     "housing": ["housing_assistance", "spm_unit_capped_housing_subsidy"],
     # Federal EITC and CTC go with the federal income tax (spec 2.2). State
     # credits that copy the federal EITC still use the federal formula, so
-    # we do not set the `eitc` or `ctc` variables to zero.
+    # we do not set the `eitc` or `ctc` variables to zero. When they are NOT
+    # removed (phase1), flat_tax.py pays them against the flat tax.
     "eitc": [],
     "ctc": [],
     "aca_ptc": ["aca_ptc"],

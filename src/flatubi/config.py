@@ -49,6 +49,11 @@ class Policy:
     def removes(self, program: str) -> bool:
         return program in self.programs_removed
 
+    @property
+    def kept_credits(self) -> list[str]:
+        """Federal credits paid against the flat tax: EITC and CTC not removed."""
+        return [c for c in ("eitc", "ctc") if c not in self.programs_removed]
+
 
 def load_config(path: str | Path) -> dict[str, Any]:
     with open(path) as f:
@@ -63,8 +68,9 @@ def resolve(cfg: dict[str, Any], scenario: str | None = None) -> Policy:
     steady_state: the config as written, with UBI for every adult.
     phase1: UBI only for children and people at or above phase1_min_age.
         Social Security is kept and offset against the UBI. Working-age
-        adults keep the current programs, so only the federal tax credits
-        (EITC, CTC) go, because the flat tax replaces the income tax.
+        adults keep the current programs. With phase1.keep_eitc_ctc (default
+        true) that includes the federal EITC and CTC, which are paid against
+        the flat tax with current-law rules.
     custom: every switch exactly as written in the config.
     """
     cfg = copy.deepcopy(cfg)
@@ -86,7 +92,8 @@ def resolve(cfg: dict[str, Any], scenario: str | None = None) -> Policy:
             removed.append("social_security")
     elif scenario == "phase1":
         ubi_min_age = int(ubi.get("phase1_min_age", 65))
-        removed = [p for p in removed if p in ("eitc", "ctc")]
+        keep = bool(cfg.get("phase1", {}).get("keep_eitc_ctc", True))
+        removed = [] if keep else ["eitc", "ctc"]
         ss_offset = bool(cfg.get("phase1", {}).get("social_security_offset", True))
     else:  # custom
         if cfg.get("custom", {}).get("ubi_min_age") is not None:

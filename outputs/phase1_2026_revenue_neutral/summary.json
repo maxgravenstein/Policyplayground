@@ -1,11 +1,11 @@
 {
   "scenario": "phase1",
   "year": 2026,
-  "flat_rate": 0.2277,
-  "revenue_neutral_rate": 0.22767257690429688,
+  "flat_rate": 0.2379,
+  "revenue_neutral_rate": 0.23788833618164062,
   "solver_converged": true,
-  "net_budget_billions": 0.6,
-  "net_transfer_billions": 333.1,
+  "net_budget_billions": 0.2,
+  "net_transfer_billions": 331.0,
   "meta": {
     "versions": {
       "policyengine-us": "2.107.4",
@@ -17,7 +17,7 @@
     "data_revision": "1.115.3",
     "data_year": 2024,
     "year": 2026,
-    "seconds": 584,
+    "seconds": 552,
     "mtr": false
   }
 }

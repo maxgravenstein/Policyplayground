@@ -2,9 +2,9 @@
   "scenario": "phase1",
   "year": 2026,
   "flat_rate": 0.3825,
-  "revenue_neutral_rate": 0.21931076049804688,
+  "revenue_neutral_rate": 0.22916793823242188,
   "solver_converged": true,
-  "net_budget_billions": 3454.0,
+  "net_budget_billions": 3243.8,
   "net_transfer_billions": 310.2,
   "meta": {
     "versions": {
@@ -17,7 +17,7 @@
     "data_revision": "1.115.3",
     "data_year": 2024,
     "year": 2026,
-    "seconds": 560,
+    "seconds": 529,
     "mtr": false
   }
 }
