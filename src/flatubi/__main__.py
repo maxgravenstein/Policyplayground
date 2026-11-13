@@ -28,13 +28,22 @@ def out_dir_for(cfg: dict, scenario: str | None) -> Path:
     """outputs/<scenario>_<year>/, or outputs/<output_name>/ if the config sets it."""
     scen = scenario or cfg.get("scenario", "steady_state")
     name = cfg.get("output_name") or f"{scen}_{cfg.get('year', 2026)}"
-    return ROOT / "outputs" / name
+    return ROOT / cfg.get("output_dir", "outputs") / name
 
 
-def _run(cfg_path: str, scenario: str | None, mtr: bool):
+def _apply_overrides(cfg: dict, args) -> dict:
+    """--flat-rate and --output-name from the command line win over the config."""
+    if getattr(args, "flat_rate", None) is not None:
+        cfg["tax"]["flat_rate"] = float(args.flat_rate)
+    if getattr(args, "output_name", None):
+        cfg["output_name"] = args.output_name
+    return cfg
+
+
+def _run(cfg_path: str, scenario: str | None, mtr: bool, args=None):
     from flatubi import run as runmod
 
-    cfg = load_config(cfg_path)
+    cfg = _apply_overrides(load_config(cfg_path), args)
     res = runmod.run(cfg, scenario=scenario, mtr=mtr, log=_log)
     out_dir = out_dir_for(cfg, res.policy.scenario)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -62,7 +71,7 @@ def _finish(res, out_dir):
 
 def cmd_run(args) -> int:
     t = time.time()
-    res, tables, solve, path = _run(args.config, args.scenario, not args.no_mtr)
+    res, tables, solve, path = _run(args.config, args.scenario, not args.no_mtr, args)
     b = tables["budget"].set_index("item")
     _log("")
     _log(tables["budget"].to_string(index=False))
@@ -164,6 +173,8 @@ def main(argv=None) -> int:
     r.add_argument("--config", default="config.yaml")
     r.add_argument("--scenario", choices=["steady_state", "phase1", "custom"])
     r.add_argument("--no-mtr", action="store_true", help="skip marginal tax rates (faster)")
+    r.add_argument("--flat-rate", type=float, help="override tax.flat_rate (e.g. 0.33)")
+    r.add_argument("--output-name", help="write to <output_dir>/<output-name>/")
     r.set_defaults(fn=cmd_run)
     s = sub.add_parser("solve-rate", help="find the revenue-neutral flat rate")
     s.add_argument("--config", default="config.yaml")

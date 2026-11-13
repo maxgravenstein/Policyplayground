@@ -33,8 +33,21 @@ from running test households.
 * `flatubi.run.dataset_path` downloads the file once with
   `huggingface_hub.hf_hub_download(repo, file, revision="1.115.3")`.
   The network must allow `huggingface.co` and `us.aws.cdn.hf.co`.
-* The Populace file (827 MB) needs more memory than this 15 GB machine has for
-  two simulations. Not used.
+* **Populace** (`hf://datasets/policyengine/populace-us/populace_us_2024.h5`,
+  revision `populace-us-2024-spm-20260909`, 827 MB) is the default dataset of
+  policyengine-us 2.107.4. Config: `configs/populace.yaml`, outputs in
+  `outputs/populace/`.
+  * Layout: one PyTables table per entity (166,321 people, 57,240 households),
+    not one array per variable. `Microsimulation(dataset=path)` reads it as is.
+  * One simulation peaks at about 13.1 GB, so only one fits at a time on 15 GB.
+    `flatubi.run` runs each simulation in a fresh process
+    (`multiprocessing` "spawn", one task per process).
+  * It has **no `employer_sponsored_insurance_premiums`**, so employer health
+    premiums are not in the flat tax base on Populace (spec 2.2: "if the
+    dataset has them"). In the Enhanced CPS they were $1.24T in 2026.
+  * Its 2026 baseline is much closer to published totals: income tax $2,595B,
+    Social Security $1,678B, SNAP $95B, SSI $57B, EITC $70B, SPM poverty 13.7%.
+    Housing assistance is too low ($6B).
 * The data year is 2024. PolicyEngine ages it to 2026 with its own uprating.
 
 ## (a) Run a microsimulation on the Enhanced CPS

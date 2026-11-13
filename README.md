@@ -56,6 +56,8 @@ python -m flatubi solve-rate --config config.yaml           # uses the saved run
 python -m flatubi compare --configs a.yaml b.yaml
 python -m flatubi baseline-check --config config.yaml       # 5.2 totals only
 python -m flatubi report --scenario phase1                  # rebuild report from the saved run
+python -m flatubi run --config configs/populace.yaml --scenario phase1   # Populace data
+python -m flatubi run --config config.yaml --flat-rate 0.33 --output-name test   # one-off rate
 ```
 
 A run takes about 15 minutes on 4 CPUs (9 with `--no-mtr`) (the baseline part is cached after the
@@ -72,6 +74,21 @@ first run). Each run writes `outputs/<scenario>_<year>/`:
 | `*_at_solved_rate.csv` | The same tables at the revenue-neutral rate |
 | `aggregate_checks.csv`, `reform_checks.csv` | Spec 5.2 and 5.3 checks |
 | `summary.json` | Key numbers |
+
+### Two datasets
+
+| | Enhanced CPS (`config.yaml`) | Populace (`configs/populace.yaml`) |
+|---|---|---|
+| Spec | yes (Section 3.1) | PolicyEngine's default dataset now |
+| People in file | 101,000 | 166,000 |
+| Memory per simulation | 8-11 GB | about 13 GB |
+| Baseline income tax vs CBO | -21% | -6% |
+| SSI, SNAP, SPM poverty | far off | close |
+| Employer health premiums | yes | **no** (left out of the base) |
+| Outputs | `outputs/` | `outputs/populace/` |
+
+Each simulation runs in its own process (`run.isolate_simulations`), so that
+memory is given back between simulations. Populace does not fit otherwise.
 
 `configs/` holds the extra runs used in the summary: each scenario at its
 revenue-neutral rate, and each scenario with the employer payroll tax paid out

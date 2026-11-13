@@ -1,0 +1,57 @@
+# Same policy as config.yaml, on the Populace data (PolicyEngine's default
+# dataset since policyengine-us 2.10x). Outputs go to outputs/populace/.
+# Run: python -m flatubi run --config configs/populace.yaml --scenario phase1
+output_dir: outputs/populace
+year: 2026
+scenario: steady_state        # steady_state | phase1 | custom
+
+ubi:
+  adult_annual: 15960
+  child_annual: 3000
+  min_age_adult: 18
+  phase1_min_age: 65           # used only in phase1
+  counts_as_ssi_income: false  # true: SSI counts the UBI as unearned income
+
+tax:
+  flat_rate: 0.3825
+  individual_filing: true
+  remove_payroll_tax: true
+  include_employer_health_in_base: true
+  include_retirement_contributions_in_base: true
+  # Not in the spec. If true, the employer payroll tax that the reform removes
+  # is added to wages (full pass-through to workers) and taxed at flat_rate.
+  employer_payroll_to_wages: false
+
+programs_removed: [snap, tanf, wic, housing, eitc, ctc, aca_ptc, unemployment, social_security]
+programs_kept: [medicaid, chip, ssi, medicare, school_meals]
+
+phase1:
+  social_security_offset: true
+
+corporate:
+  profit_base_billions: 1600
+  # Current-law corporate revenue for the baseline row. If empty, the model
+  # uses baseline_rate x profit_base.
+  baseline_rate: 0.21
+  baseline_revenue_billions:
+
+solver:
+  target_net_budget_billions: 0
+
+behavior:
+  enabled: false
+  elasticity_low_income: 0.25
+  elasticity_high_income: 0.5
+  high_income_threshold: 200000
+
+data:
+  label: "Populace US 2024 (build populace-us-2024-spm-20260909, pinned by policyengine-us 2.107.4)"
+  repo: policyengine/populace-us
+  repo_type: dataset
+  file: populace_us_2024.h5
+  revision: populace-us-2024-spm-20260909
+  path: data/populace/populace_us_2024.h5
+
+run:
+  # Each simulation needs about 13 GB on Populace: run each in its own process.
+  isolate_simulations: true

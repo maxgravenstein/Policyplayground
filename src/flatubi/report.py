@@ -34,16 +34,33 @@ BIN_COLORS = {
 LIMITS = [
     ("Static.", "No change in work, saving, or migration, except the rough adjustment of the behavior module (spec 7.4), and only when it is on."),
     ("One year.", "No transition path over many years. (A separate spreadsheet model covers 2027-2070.)"),
-    ("Missing income.", "Survey data under-reports high incomes and capital gains. The data have employer health premiums (imputed) but no employer retirement contributions. Inheritances are part of the design but are not in the data: they are excluded."),
+    ("Missing income.", "Survey data under-reports high incomes and capital gains. The data have no employer retirement contributions. Inheritances are part of the design but are not in the data: they are excluded."),
     ("Corporate tax", "is an estimate outside the microsimulation: flat_rate x corporate_profit_base. The microsimulation taxes dividends and capital gains in full and does not model the shareholder credit."),
     ("No spending outside taxes and transfers.", "Defense, interest, and other federal functions are not modeled."),
     ("SSI and Medicaid interactions.", "PolicyEngine leaves `basic_income` out of SSI, SNAP and Medicaid income while it is not taxable. So the UBI does not reduce SSI or Medicaid in this model (config: ubi.counts_as_ssi_income). Under current SSI rules, a cash UBI would count as unearned income."),
     ("Employer payroll tax.", "The reform removes it, but by default the saving does not go to workers as higher pay (config: tax.employer_payroll_to_wages)."),
     ("State taxes", "stay at current law. They still use federal AGI and the federal EITC, so they do not change much. Their MTR is in the reform MTR."),
-    ("Data.", "Enhanced CPS 2024 (policyengine-us-data tag 1.115.3), aged to the model year by PolicyEngine. The 'main' copy of the file on Hugging Face has $9.3T of miscellaneous income and is not used. Baseline totals differ from published totals; see the checks table."),
-    ("SPM poverty level.", "Baseline SPM poverty in PolicyEngine on this data is far above the Census rate (see the checks table): SPM resources subtract large medical and work costs. The change in poverty between baseline and reform is more reliable than the level."),
     ("Net income", "is PolicyEngine household net income plus ACA premium tax credits (cash-like). Medicaid, CHIP and Medicare are not in net income."),
 ]
+
+
+def limits(res, tables) -> list[tuple[str, str]]:
+    """LIMITS plus the items that depend on the data used."""
+    meta = res.meta
+    out = list(LIMITS)
+    label = meta.get("dataset_label") or "Enhanced CPS 2024 (policyengine-us-data tag 1.115.3)"
+    data_txt = f"{label}, survey year 2024, aged to {meta.get('year')} by PolicyEngine. Baseline totals differ from published totals; see the checks table."
+    if "Enhanced CPS" in label:
+        data_txt += " The 'main' copy of the Enhanced CPS on Hugging Face has $9.3T of miscellaneous income and is not used."
+    out.append(("Data.", data_txt))
+    if res.policy.include_employer_health and not meta.get("employer_health_in_data", True):
+        out.append(("Employer health premiums.", "The config puts them in the tax base, but this dataset has no employer health premiums, so they are left out (spec 2.2: 'if the dataset has them'). The base is smaller and the revenue-neutral rate higher than with them."))
+    checks = tables.get("aggregate_checks")
+    if checks is not None and "spm_poverty_rate" in set(checks["item"]):
+        gap = float(checks.set_index("item").loc["spm_poverty_rate", "gap_pct"])
+        if abs(gap) > 15:
+            out.append(("SPM poverty level.", "Baseline SPM poverty on this data is far from the Census rate (see the checks table). The change in poverty between baseline and reform is more reliable than the level."))
+    return out
 
 
 def _fig_to_data_uri(fig) -> str:
@@ -351,7 +368,7 @@ def render_html(res, tables, solve) -> str:
     parts.append(_fmt_table(tables["reform_checks"]))
 
     parts.append("<h2>8. Limits</h2><ul class='limits'>")
-    parts += [f"<li><b>{html.escape(a)}</b> {html.escape(t)}</li>" for a, t in LIMITS]
+    parts += [f"<li><b>{html.escape(a)}</b> {html.escape(t)}</li>" for a, t in limits(res, tables)]
     parts.append("</ul>")
 
     meta = res.meta
@@ -359,7 +376,7 @@ def render_html(res, tables, solve) -> str:
     parts += [
         "<h2>9. Run details</h2>",
         f"<p class='note'>Packages: {html.escape(', '.join(f'{k} {v}' for k, v in meta.get('versions', {}).items()))}. "
-        f"Data: {html.escape(str(meta.get('dataset')))} (revision {html.escape(str(meta.get('data_revision')))}, survey year {meta.get('data_year')}), "
+        f"Data: {html.escape(str(meta.get('dataset_label') or meta.get('dataset')))}, file {html.escape(str(meta.get('dataset')))} (revision {html.escape(str(meta.get('data_revision')))}, survey year {meta.get('data_year')}), "
         f"model year {meta.get('year')}. Run time {meta.get('seconds')} s.</p>",
         "<h3>Config used</h3>",
         f"<pre>{html.escape(yaml.safe_dump(cfg, sort_keys=False))}</pre>",
