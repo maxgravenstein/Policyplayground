@@ -14,7 +14,7 @@ ubi:
   counts_as_ssi_income: false  # true: SSI counts the UBI as unearned income
 
 tax:
-  flat_rate: 0.3561
+  flat_rate: 0.394
   individual_filing: true
   remove_payroll_tax: true
   include_employer_health_in_base: true

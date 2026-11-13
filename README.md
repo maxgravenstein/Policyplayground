@@ -21,7 +21,8 @@ The results are in [`outputs/SUMMARY.md`](outputs/SUMMARY.md) (Enhanced CPS) and
 | UBI | $15,960 per adult (18+), $3,000 per child. Not taxable. No phase-out. |
 | Flat tax | 38.25% on each person's own income. No brackets, deductions or credits. Capital gains at the same rate. Employer health premiums in the base. |
 | Taxes removed | Federal income tax (with EITC, CTC and all credits), federal payroll and self-employment taxes |
-| Programs removed | SNAP, TANF, WIC, housing assistance, ACA premium credits, unemployment insurance, Social Security (steady state) |
+| Programs removed | SNAP, TANF, WIC, housing assistance, ACA premium credits, unemployment insurance |
+| Social Security | Steady state: kept above the UBI only. Phase 1: kept, with the UBI as a floor for people 65+ |
 | Programs kept | Medicaid, CHIP, SSI, Medicare, school meals |
 | Corporate tax | flat_rate x $1.6T profits, outside the microsimulation |
 
@@ -29,7 +30,10 @@ Every number is in [`config.yaml`](config.yaml).
 
 ### Scenarios
 
-* `steady_state`: the full system.
+* `steady_state`: the full system. Social Security is kept only above the
+  UBI: each beneficiary gets max(benefit - own UBI, 0) on top of the UBI, taxed
+  at the flat rate (`steady_state.social_security_residual`; set it to false to
+  remove Social Security, as in the original spec).
 * `phase1`: UBI only for children and people 65+. Social Security is kept and
   offset: each beneficiary 65+ gets max(Social Security, UBI). Working-age
   adults keep SNAP, TANF, WIC, housing, UI and ACA credits. Flat tax for all.

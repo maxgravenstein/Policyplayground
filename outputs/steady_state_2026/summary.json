@@ -2,10 +2,10 @@
   "scenario": "steady_state",
   "year": 2026,
   "flat_rate": 0.3825,
-  "revenue_neutral_rate": 0.3560905456542969,
+  "revenue_neutral_rate": 0.3940162658691406,
   "solver_converged": true,
-  "net_budget_billions": 491.0,
-  "net_transfer_billions": 2008.7,
+  "net_budget_billions": -223.1,
+  "net_transfer_billions": 1836.7,
   "meta": {
     "versions": {
       "policyengine-us": "2.107.4",
@@ -14,10 +14,12 @@
       "flatubi": "0.1.0"
     },
     "dataset": "data/ecps_1.115.3/enhanced_cps_2024.h5",
+    "dataset_label": "Enhanced CPS 2024 (policyengine-us-data 1.115.3)",
     "data_revision": "1.115.3",
     "data_year": 2024,
     "year": 2026,
-    "seconds": 781,
-    "mtr": true
+    "seconds": 1488,
+    "mtr": true,
+    "employer_health_in_data": true
   }
 }

@@ -2,10 +2,10 @@
   "scenario": "steady_state",
   "year": 2026,
   "flat_rate": 0.3825,
-  "revenue_neutral_rate": 0.3440284729003906,
+  "revenue_neutral_rate": 0.3674888610839844,
   "solver_converged": true,
-  "net_budget_billions": 807.2,
-  "net_transfer_billions": 1820.9,
+  "net_budget_billions": 327.2,
+  "net_transfer_billions": 1653.2,
   "meta": {
     "versions": {
       "policyengine-us": "2.107.4",
@@ -18,7 +18,7 @@
     "data_revision": "populace-us-2024-spm-20260909",
     "data_year": 2024,
     "year": 2026,
-    "seconds": 4365,
+    "seconds": 2087,
     "mtr": true,
     "employer_health_in_data": false
   }

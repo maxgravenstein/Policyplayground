@@ -6,54 +6,59 @@ per year. Full tables and charts are in each folder's `report.html`.
 
 **See also `outputs/populace/SUMMARY.md`:** the same runs on PolicyEngine's
 Populace data, whose baseline is much closer to published totals (steady-state
-rate 34.40%, phase 1 23.11%).
+rate 36.75%, phase 1 23.11%). Populace is the better dataset.
+
+**Design change (2026-11-13): the steady state keeps Social Security above the
+UBI.** Each beneficiary gets max(benefit - own UBI, 0) on top of the UBI, taxed
+at the flat rate (switch: `steady_state.social_security_residual`). Before, the
+steady state removed Social Security: revenue-neutral at 35.61%, poverty
+-11.1 pp, poverty for people 65+ +0.5 pp. Phase 1 is unchanged.
 
 ## Key results
 
 | | Steady state | Phase 1 |
 |---|---|---|
-| **Revenue-neutral flat rate** | **35.61%** | **22.77%** |
-| Net budget effect at 38.25% | +$491B (surplus) | +$3,157B (surplus) |
+| **Revenue-neutral flat rate** | **39.40%** | **22.77%** |
+| Net budget effect at 38.25% | -$223B (deficit) | +$3,157B (surplus) |
 | UBI cost (gross) | $4,503B | $420B |
-| Flat tax revenue at the revenue-neutral rate | $6,050B | $4,278B |
-| Net transfer (UBI minus flat tax, where positive), at the revenue-neutral rate | **$2,058B** | $333B |
-| Net transfer at 38.25% | $2,009B | $311B |
-| SPM poverty change at the revenue-neutral rate | **-11.1 pp** (23.7% to 12.6%) | **+6.3 pp** (23.7% to 30.0%) |
-| Child poverty change | -10.7 pp | +8.9 pp |
-| Poverty change, people 65+ | +0.5 pp | +3.0 pp |
-| Deep poverty change | -4.3 pp | +1.0 pp |
-| Gini (equivalized, person-weighted) | 0.460 to 0.410 | 0.460 to 0.490 |
+| Social Security paid | $800B (above the UBI) | $1,785B |
+| Flat tax revenue at the revenue-neutral rate | $7,004B | $4,278B |
+| Net transfer (UBI minus flat tax, where positive), at the revenue-neutral rate | **$1,814B** | $333B |
+| SPM poverty change at the revenue-neutral rate | **-12.6 pp** (23.7% to 11.1%) | **+6.3 pp** (23.7% to 30.0%) |
+| Child poverty change | -9.7 pp | +8.9 pp |
+| Poverty change, people 65+ | **-7.4 pp** | +3.0 pp |
+| Deep poverty change | -4.5 pp | +1.0 pp |
+| Gini (equivalized, person-weighted) | 0.460 to 0.395 | 0.460 to 0.490 |
 
 The revenue-neutral rates come from the solver (bisection on the tax step) and
-were confirmed by full reruns at that rate: net budget +$0.2B (steady state) and
+were confirmed by full reruns at that rate: net budget -$0.3B (steady state) and
 +$0.6B (phase 1). Folders: `steady_state_2026/`, `phase1_2026/` (at 38.25%, with
 MTRs) and `*_revenue_neutral/` (at the solved rate).
 
 ## What the numbers say
 
-1. **Steady state pays for itself below 38.25%.** At 35.61% it is
-   revenue-neutral against current law, including $570B of corporate tax at the
-   flat rate (outside the microsimulation).
-2. **The net transfer is about $2.1 trillion, not $1.1 trillion.** The earlier
-   estimate is about half of what the model finds. The model has 268 million
-   adults and 73 million children; the UBI alone costs $4.5 trillion.
-3. **Steady state cuts poverty by about 11 points.** The bottom three deciles
-   gain 20% to 188% of net income. Deciles 7 to 10 lose 7% to 12%.
-4. **People 65+ lose the most.** On average their households lose about $20,000
-   (20% of net income). Poverty for people 65+ does not fall. Every one of the 10
-   biggest losing groups in the steady state gets most of its income from Social
-   Security, or is 65+ and loses Social Security.
-5. **Phase 1 as designed raises poverty.** Working-age adults get no UBI but
+1. **Keeping Social Security above the UBI costs about 3.8 points of rate**
+   (35.61% to 39.40%). It pays $800B of Social Security, and SSI rises less
+   ($33B instead of $80B).
+2. **Poverty for people 65+ now falls 7.4 points** instead of rising, and total
+   poverty falls 12.6 points.
+3. **For a retiree above the UBI, the UBI now just replaces part of Social
+   Security.** Their remaining loss is tax: the flat tax on Social Security and
+   pensions, with no standard deduction. On average, households of people 65+
+   still lose 20% of net income.
+4. **The net transfer is about $1.8 trillion.** The earlier $1.1 trillion
+   estimate is still well below the model.
+5. **Deciles 1-4 gain (3% to 189%); deciles 5-10 lose (2% to 14%).**
+6. **Phase 1 as designed raises poverty.** Working-age adults get no UBI but
    pay the flat tax from the first dollar and lose the EITC and CTC. At the
    revenue-neutral 22.77%, poverty rises 6.3 points. On average only the
    bottom decile (children's UBI) and the top decile (lower tax) gain.
-6. **Phase 1 taxes Social Security in full.** The offset gives each retiree
+7. **Phase 1 taxes Social Security in full.** The offset gives each retiree
    max(Social Security, UBI) before tax, then the flat tax takes 22.77% of the
-   Social Security. Retirees whose benefit is above the UBI lose the tax.
-7. **Phase 1 MTRs are high for low earners who keep SNAP and housing:**
-   about 70% at 38.25% (flat tax + benefit phase-out). In the steady state, 26% of workers
-   face exactly the flat rate; most others also pay state income tax
-   (reform MTR about 44%).
+   Social Security.
+8. **Marginal rates.** In the steady state, 26% of workers face exactly the
+   flat rate; most others also pay state income tax (reform MTR about 44% at
+   38.25%). Phase 1 MTRs for low earners who keep SNAP and housing are about 70%.
 
 ## The 10 biggest losing household types
 
@@ -61,25 +66,26 @@ Groups are household type x baseline income fifth x main income source, with at
 least 0.5 million people. Ranked by the average % loss of net income, at the
 revenue-neutral rate. Amounts are per household per year.
 
-### Steady state (35.61%)
+### Steady state (39.40%)
 
 | # | Who | People | Average change | Main cause |
 |---|---|---|---|---|
-| 1 | Retired households (all adults 65+), top income fifth, living mainly on Social Security | 2.0 M | -$79,400 (-54%) | Lose $96,900 of Social Security; UBI pays back $31,900 |
-| 2 | Retired households, fourth fifth, mainly Social Security | 3.7 M | -$39,400 (-51%) | Lose $52,800 of Social Security; UBI +$20,800 |
-| 3 | Single adults under 65 (mostly SSDI), bottom fifth | 1.5 M | -$3,900 (-50%) | Lose $14,500 SSDI and $5,200 of SNAP and housing; UBI +$16,000. 29% have housing aid, 50% SNAP |
-| 4 | Single adults under 65 on SSDI, second fifth | 2.6 M | -$15,000 (-48%) | Lose $30,700 SSDI; UBI +$16,000 |
-| 5 | Single adults under 65 on SSDI, middle fifth | 1.3 M | -$19,000 (-46%) | Lose $29,900 SSDI and $3,100 more tax; 34% have housing aid |
-| 6 | Retired households, middle fifth, mainly Social Security | 7.3 M | -$18,500 (-37%) | Lose $38,100 of Social Security; UBI +$20,800; SSI +$3,200 |
-| 7 | Retired households, fourth fifth, mainly pensions and investments | 3.1 M | -$23,000 (-29%) | Lose $29,500 Social Security and pay $14,300 more tax |
-| 8 | Couples without children (one under 65), middle fifth, mainly Social Security | 1.1 M | -$16,300 (-27%) | Lose $46,100 Social Security; UBI +$31,900 |
-| 9 | Retired households, fourth fifth, still working | 3.0 M | -$21,000 (-26%) | Lose $27,600 Social Security and pay $16,100 more tax |
-| 10 | Retired households, top fifth, mainly pensions and investments | 7.6 M | -$64,900 (-25%) | Lose $49,600 Social Security and pay $39,500 more tax |
+| 1 | Single adults under 65 on SSDI, bottom fifth | 1.5 M | -$3,100 (-40%) | SSDI is mostly below the UBI, so the UBI replaces it; they also lose $5,200 of SNAP and housing. 29% have housing aid, 50% SNAP |
+| 2 | Retired households (all adults 65+), top fifth, mainly Social Security | 2.0 M | -$42,200 (-29%) | $42,400 more tax (flat tax on Social Security above the UBI and other income) |
+| 3 | Retired households, fourth fifth, mainly Social Security | 3.7 M | -$21,600 (-28%) | $20,700 more tax |
+| 4 | Single adults under 65 on SSDI, middle fifth | 1.3 M | -$11,000 (-27%) | $8,900 more tax and $2,600 less benefits. 34% have housing aid |
+| 5 | Retired households, fourth fifth, mainly pensions and investments | 3.1 M | -$19,000 (-24%) | $20,800 more tax |
+| 6 | Single parents, second fifth, living mainly on benefits | 1.4 M | -$9,100 (-24%) | Lose $19,500 of SNAP and housing aid (all of them have both); UBI +$19,700; $9,200 more tax |
+| 7 | Retired households, top fifth, mainly pensions and investments | 7.6 M | -$59,200 (-23%) | $61,300 more tax |
+| 8 | Retired households, middle fifth, mainly Social Security | 7.3 M | -$11,000 (-22%) | $11,700 more tax |
+| 9 | Retired households, fourth fifth, still working | 3.0 M | -$16,800 (-21%) | $22,800 more tax |
+| 10 | Single adults under 65 on SSDI, second fifth | 2.6 M | -$6,400 (-20%) | $6,100 more tax |
 
-**Fix to consider:** the loss of Social Security above the UBI. A transition
-credit for accrued benefits, or a higher UBI for 65+ and for disabled people,
-would target groups 1 to 10. SSDI recipients (groups 3 to 5) also lose SNAP and
-housing aid.
+For every Social Security group, the UBI and the Social Security cut cancel
+out (the cut equals the UBI). The loss that remains is the flat tax.
+
+**Fixes to consider:** a lower tax on legacy Social Security (or none); and
+for SSDI recipients and families on housing aid, the loss of SNAP and housing.
 
 ### Phase 1 (22.77%)
 
@@ -109,13 +115,13 @@ paid out as wages and taxed. See `*_payroll_to_wages/`.
 
 | | Steady state | Phase 1 |
 |---|---|---|
-| Revenue-neutral rate, default (no pass-through) | 35.61% | 22.77% |
-| Revenue-neutral rate, with pass-through | **34.18%** | **21.93%** |
-| Change in net income at that rate, deciles 1-6 | +0% to +195% | -10% to +26% |
-| Change in net income at that rate, deciles 7-10 | -1% to -6% | -4% to +8% |
+| Revenue-neutral rate, default (no pass-through) | 39.40% | 22.77% |
+| Revenue-neutral rate, with pass-through | **37.88%** | **21.93%** |
+| Change in net income at that rate, deciles 1-6 | +2% to +196% | -10% to +26% |
+| Change in net income at that rate, deciles 7-10 | -1% to -9% | -4% to +8% |
 
-With pass-through, the steady state is close to neutral for the middle of the
-distribution, and the losses at the top fall from 7-12% to 1-6%. Phase 1 still
+With pass-through, deciles 1-6 gain in the steady state, and the losses at the
+top fall from 7-14% to 1-9%. Phase 1 still
 makes most deciles worse off. (Poverty in these folders is at 38.25%, the run
 rate.)
 
@@ -137,8 +143,8 @@ rate.)
 * **SPM poverty is too high in the baseline.** The change in poverty is more
   reliable than the level.
 * **SSI for disabled people is almost zero in the data** ($9B against about
-  $60B). When Social Security goes, SSI rises by $70B. With full SSI data, both
-  numbers would be larger.
+  $60B). In the steady state SSI rises by $33B. With full SSI data, this would
+  be larger.
 * **Housing assistance is $172B in the model**, about three times HUD rental
   aid. The saving from removing it is overstated.
 * The UBI does not count as income for SSI, SNAP or Medicaid (PolicyEngine
