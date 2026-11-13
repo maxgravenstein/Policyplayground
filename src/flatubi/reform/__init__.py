@@ -18,6 +18,10 @@ def build_reform(policy: Policy) -> type[Reform]:
     from flatubi.reform.datafix import apply_data_fixes
 
     new_variables = ubi.make_variables(policy) + flat_tax.make_variables(policy)
+    if policy.social_security_residual:
+        from flatubi.reform import social_security
+
+        new_variables += social_security.make_variables()
     neutralized = programs.variables_to_neutralize(policy) + flat_tax.payroll_variables(policy)
     switches = flat_tax.parameter_switches(policy)
     start = instant(f"{policy.year - 1}-01-01")

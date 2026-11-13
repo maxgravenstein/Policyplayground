@@ -24,6 +24,12 @@ tax:
 programs_removed: [snap, tanf, wic, housing, eitc, ctc, aca_ptc, unemployment, social_security]
 programs_kept: [medicaid, chip, ssi, medicare, school_meals]
 
+steady_state:
+  # Keep Social Security above the UBI: each beneficiary gets
+  # max(benefit - own UBI, 0) on top of the UBI, taxed at the flat rate.
+  # false: Social Security is removed (the original spec).
+  social_security_residual: true
+
 phase1:
   social_security_offset: true
 

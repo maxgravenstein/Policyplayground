@@ -44,6 +44,7 @@ class Policy:
     programs_removed: list[str]
     programs_kept: list[str]
     social_security_offset: bool
+    social_security_residual: bool  # steady state: keep Social Security above the UBI
     raw: dict[str, Any] = field(repr=False, default_factory=dict)
 
     def removes(self, program: str) -> bool:
@@ -60,7 +61,10 @@ def load_config(path: str | Path) -> dict[str, Any]:
 def resolve(cfg: dict[str, Any], scenario: str | None = None) -> Policy:
     """Apply the scenario rules of spec Section 2.5 to the config switches.
 
-    steady_state: the config as written, with UBI for every adult.
+    steady_state: the config as written, with UBI for every adult. With
+        steady_state.social_security_residual (default true), Social Security
+        is kept above the UBI: each beneficiary gets max(benefit - own UBI, 0)
+        on top of the UBI. Otherwise Social Security is removed.
     phase1: UBI only for children and people at or above phase1_min_age.
         Social Security is kept and offset against the UBI. Working-age
         adults keep the current programs, so only the federal tax credits
@@ -81,8 +85,12 @@ def resolve(cfg: dict[str, Any], scenario: str | None = None) -> Policy:
     ubi_min_age = None
     ss_offset = False
 
+    ss_residual = False
     if scenario == "steady_state":
-        if "social_security" not in removed:
+        ss_residual = bool(cfg.get("steady_state", {}).get("social_security_residual", True))
+        if ss_residual:
+            removed = [p for p in removed if p != "social_security"]
+        elif "social_security" not in removed:
             removed.append("social_security")
     elif scenario == "phase1":
         ubi_min_age = int(ubi.get("phase1_min_age", 65))
@@ -92,6 +100,11 @@ def resolve(cfg: dict[str, Any], scenario: str | None = None) -> Policy:
         if cfg.get("custom", {}).get("ubi_min_age") is not None:
             ubi_min_age = int(cfg["custom"]["ubi_min_age"])
         ss_offset = bool(cfg.get("phase1", {}).get("social_security_offset", False))
+        ss_residual = bool(cfg.get("custom", {}).get("social_security_residual", False))
+        if ss_residual and ss_offset:
+            raise ValueError("custom: use social_security_offset or social_security_residual, not both.")
+        if ss_residual:
+            removed = [p for p in removed if p != "social_security"]
         if ss_offset and "social_security" in removed:
             raise ValueError(
                 "custom: social_security_offset needs Social Security kept. "
@@ -117,5 +130,6 @@ def resolve(cfg: dict[str, Any], scenario: str | None = None) -> Policy:
         programs_removed=removed,
         programs_kept=kept,
         social_security_offset=ss_offset,
+        social_security_residual=ss_residual,
         raw=cfg,
     )

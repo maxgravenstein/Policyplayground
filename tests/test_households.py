@@ -76,14 +76,38 @@ def test_single_parent_two_children(household):
 
 
 def test_retiree_steady_state(household):
+    """Steady state: Social Security kept above the UBI, taxed at the flat rate."""
     h = household({"a": {"age": 70, "social_security_retirement": 24_000}})
     assert total(h.b, "social_security") == pytest.approx(24_000)
-    assert total(h.r, "social_security") == 0
+    assert total(h.r, "social_security") == pytest.approx(24_000 - UBI_ADULT)
     assert total(h.r, "basic_income") == pytest.approx(UBI_ADULT)
-    assert total(h.r, "flat_tax") == 0  # UBI is not taxable
+    assert total(h.r, "flat_tax") == pytest.approx(RATE * (24_000 - UBI_ADULT))  # UBI not taxed
     # Medicare kept.
     assert total(h.r, "medicare_cost") == pytest.approx(total(h.b, "medicare_cost"))
     assert total(h.r, "medicare_cost") > 0
+
+
+@pytest.mark.parametrize(
+    "person, kept",
+    [
+        ({"age": 70, "social_security_retirement": 12_000}, 0),  # below the UBI
+        ({"age": 50, "social_security_disability": 20_000}, 20_000 - UBI_ADULT),  # SSDI
+        ({"age": 10, "social_security_survivors": 10_000}, 10_000 - UBI_CHILD),  # child
+    ],
+)
+def test_steady_state_social_security_above_ubi(household, person, kept):
+    people = {"a": person} if person["age"] >= 18 else {"g": {"age": 40}, "a": person}
+    h = household(people)
+    ss = h.r("social_security")
+    idx = list(people).index("a")
+    assert float(ss[idx]) == pytest.approx(kept)
+
+
+def test_steady_state_social_security_removed_switch(household):
+    """steady_state.social_security_residual: false removes Social Security (spec)."""
+    h = household({"a": {"age": 70, "social_security_retirement": 24_000}}, system="steady_state:no_ss")
+    assert total(h.r, "social_security") == 0
+    assert total(h.r, "basic_income") == pytest.approx(UBI_ADULT)
 
 
 @pytest.mark.parametrize("ss, expected", [(24_000, 24_000), (12_000, UBI_ADULT)])
@@ -128,7 +152,8 @@ def test_zero_rate_zero_ubi_equals_baseline_minus_removed(household):
         },
         system="steady_state:zero",
     )
-    removed_benefits = ["snap", "tanf", "wic", "housing_assistance", "unemployment_compensation", "social_security"]
+    # With UBI = 0, the steady state keeps all of Social Security (benefit - 0).
+    removed_benefits = ["snap", "tanf", "wic", "housing_assistance", "unemployment_compensation"]
     expected = (
         total(h.b, "household_net_income")
         + total(h.b, "income_tax")

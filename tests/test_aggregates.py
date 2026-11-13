@@ -103,7 +103,9 @@ def test_zero_rate_zero_ubi_aggregate():
     def tot(frame, cols):
         return float((frame[cols].sum(axis=1) * w).sum())
 
-    removed = ["snap", "tanf", "wic", "housing_assistance", "unemployment_compensation", "social_security"]
+    removed = ["snap", "tanf", "wic", "housing_assistance", "unemployment_compensation"]
+    if not res.policy.social_security_residual:  # with UBI = 0 the residual is all of it
+        removed.append("social_security")
     taxes = ["income_tax"] + outputs.FEDERAL_PAYROLL
     expected = tot(b, ["household_net_income"]) + tot(b, taxes) - tot(b, removed)
     actual = tot(r, ["household_net_income"])
