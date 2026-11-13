@@ -1,0 +1,25 @@
+{
+  "scenario": "phase1",
+  "year": 2026,
+  "flat_rate": 0.2311,
+  "revenue_neutral_rate": 0.23114395141601562,
+  "solver_converged": true,
+  "net_budget_billions": -1.0,
+  "net_transfer_billions": 400.8,
+  "meta": {
+    "versions": {
+      "policyengine-us": "2.107.4",
+      "policyengine-core": "3.34.10",
+      "policyengine-us-data": "1.89.0",
+      "flatubi": "0.1.0"
+    },
+    "dataset": "data/populace/populace_us_2024.h5",
+    "dataset_label": "Populace US 2024 (build populace-us-2024-spm-20260909, pinned by policyengine-us 2.107.4)",
+    "data_revision": "populace-us-2024-spm-20260909",
+    "data_year": 2024,
+    "year": 2026,
+    "seconds": 2060,
+    "mtr": false,
+    "employer_health_in_data": false
+  }
+}

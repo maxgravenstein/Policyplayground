@@ -1,0 +1,2 @@
+check,expected_billions,model_billions,gap_pct,result
+Total UBI = adults x adult UBI + children x child UBI (within 1%),4506.945821231304,4506.945821231304,0.0,pass

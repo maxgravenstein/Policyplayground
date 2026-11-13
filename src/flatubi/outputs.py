@@ -111,7 +111,10 @@ def with_rate(res: RunResult, rate: float) -> RunResult:
 
 
 def _total(frame: pd.DataFrame, cols) -> float:
+    """Weighted total; NaN if the values were not computed (out of memory)."""
     cols = [cols] if isinstance(cols, str) else list(cols)
+    if frame[cols].isna().all().all():
+        return float("nan")
     return float((frame[cols].sum(axis=1) * frame.weight).sum())
 
 

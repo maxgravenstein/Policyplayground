@@ -48,6 +48,13 @@ from running test households.
   * Its 2026 baseline is much closer to published totals: income tax $2,595B,
     Social Security $1,678B, SNAP $95B, SSI $57B, EITC $70B, SPM poverty 13.7%.
     Housing assistance is too low ($6B).
+  * **Medicaid cannot be computed on Populace on a 15 GB machine,** even alone
+    in its own process: the kernel kills it. `flatubi.run` then marks the
+    Medicaid budget line "not computed". CHIP, Medicare and school meals work.
+  * The parent process watches free memory and stops a child below 0.8 GB, but
+    Medicaid's memory rises too fast for that; the kernel kills it first. Exit
+    code -9 is treated the same way. Once, before the guard, the kernel's
+    out-of-memory kill also restarted the cloud session.
 * The data year is 2024. PolicyEngine ages it to 2026 with its own uprating.
 
 ## (a) Run a microsimulation on the Enhanced CPS

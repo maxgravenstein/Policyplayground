@@ -11,7 +11,8 @@ It answers three questions:
 The model is **static and annual**. People do not change behavior, unless you
 turn on the rough behavior module (`behavior.enabled`).
 
-The results of the last runs are in [`outputs/SUMMARY.md`](outputs/SUMMARY.md).
+The results are in [`outputs/SUMMARY.md`](outputs/SUMMARY.md) (Enhanced CPS) and
+[`outputs/populace/SUMMARY.md`](outputs/populace/SUMMARY.md) (Populace).
 
 ## The policy
 

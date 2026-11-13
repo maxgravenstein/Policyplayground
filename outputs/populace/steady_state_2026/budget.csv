@@ -1,0 +1,25 @@
+group,item,baseline,reform,difference
+Revenue,Federal income tax,2595.3,0.0,-2595.3
+Revenue,"Payroll taxes (employee, employer, self-employment)",1713.5,0.0,-1713.5
+Revenue,Flat tax,0.0,7412.7,7412.7
+Revenue,Corporate tax (outside the microsimulation),336.0,612.0,276.0
+Spending,UBI (gross),0.0,4506.9,4506.9
+Spending,SNAP,95.1,0.0,-95.1
+Spending,TANF,5.2,0.0,-5.2
+Spending,WIC,11.7,0.0,-11.7
+Spending,Housing assistance,5.8,0.0,-5.8
+Spending,ACA premium tax credits,145.3,0.0,-145.3
+Spending,Unemployment insurance,42.1,0.0,-42.1
+Spending,Social Security,1677.9,0.0,-1677.9
+Spending,SSI,57.0,103.5,46.5
+Spending,Medicaid,,,
+Spending,CHIP,12.3,12.1,-0.1
+Spending,Medicare,946.0,948.2,2.2
+Spending,School meals,37.1,37.4,0.4
+Total,Total revenue,4644.8,8024.7,3380.0
+Total,Total spending,3035.4,5608.2,2572.8
+Total,Net budget effect (revenue minus spending),1609.4,2416.5,807.2
+Memo,EITC (inside federal income tax),70.0,0.0,-70.0
+Memo,CTC (inside federal income tax),158.9,0.0,-158.9
+Memo,State and local income tax (not in net budget),577.3,577.4,0.1
+Memo,"Net transfer: UBI minus flat tax, where positive",0.0,1820.9,1820.9

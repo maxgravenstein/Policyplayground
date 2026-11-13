@@ -55,6 +55,9 @@ def limits(res, tables) -> list[tuple[str, str]]:
     out.append(("Data.", data_txt))
     if res.policy.include_employer_health and not meta.get("employer_health_in_data", True):
         out.append(("Employer health premiums.", "The config puts them in the tax base, but this dataset has no employer health premiums, so they are left out (spec 2.2: 'if the dataset has them'). The base is smaller and the revenue-neutral rate higher than with them."))
+    missing = sorted(set(res.baseline.meta.get("not_computed", [])) | set(res.reform.meta.get("not_computed", [])))
+    if missing:
+        out.append(("Not computed.", f"{', '.join(missing)}: the simulation needed more memory than this machine has. These budget lines are blank and left out of the totals. They are programs kept at current law, so the reform changes them little."))
     checks = tables.get("aggregate_checks")
     if checks is not None and "spm_poverty_rate" in set(checks["item"]):
         gap = float(checks.set_index("item").loc["spm_poverty_rate", "gap_pct"])

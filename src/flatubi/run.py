@@ -245,15 +245,31 @@ def simulate_frames(path: str, policy: Policy | None, year: int, isolate: bool =
     hh_light = [v for v in hh_all if v not in HEAVY_HOUSEHOLD_VARIABLES]
     p_light = [v for v in p_all if v not in HEAVY_PERSON_VARIABLES]
     main = _isolated(isolate, "simulate_part", path, policy, year, hh_light, p_light)
-    print("    health-cost values (second simulation)", flush=True)
-    heavy = _isolated(isolate, "simulate_part", path, policy, year, HEAVY_HOUSEHOLD_VARIABLES, HEAVY_PERSON_VARIABLES)
-    if not np.array_equal(main.household.household_id.to_numpy(), heavy.household.household_id.to_numpy()):
-        raise ValueError("The two simulations returned households in a different order.")
-    for c in HEAVY_HOUSEHOLD_VARIABLES:
-        main.household[c] = heavy.household[c].to_numpy()
-    for c in HEAVY_PERSON_VARIABLES:
-        main.person[c] = heavy.person[c].to_numpy()
-    main.meta["seconds"] = main.meta.get("seconds", 0) + heavy.meta.get("seconds", 0)
+    main.meta["not_computed"] = []
+    groups = [
+        (["medicaid"], ["medicaid"]),
+        (["chip"], []),
+        (["medicare_cost"], []),
+        (["free_school_meals", "reduced_price_school_meals"], []),
+    ]
+    for hh_group, p_group in groups:
+        print(f"    health-cost values: {', '.join(hh_group)} (own simulation)", flush=True)
+        try:
+            part = _isolated(isolate, "simulate_part", path, policy, year, hh_group, p_group)
+        except ChildOutOfMemory as e:
+            print(f"    NOT COMPUTED: {e}", flush=True)
+            for c in hh_group:
+                main.household[c] = np.nan
+            for c in p_group:
+                main.person[c] = np.nan
+            main.meta["not_computed"] += hh_group
+            continue
+        if not np.array_equal(main.household.household_id.to_numpy(), part.household.household_id.to_numpy()):
+            raise ValueError("The simulations returned households in a different order.")
+        for c in hh_group:
+            main.household[c] = part.household[c].to_numpy()
+        for c in p_group:
+            main.person[c] = part.person[c].to_numpy()
     return main
 
 
@@ -270,6 +286,38 @@ def _child_to_file(fn_name: str, args: tuple, out: str) -> None:
     result = globals()[fn_name](*args)
     with open(out, "wb") as f:
         pickle.dump(result, f)
+
+
+class ChildOutOfMemory(RuntimeError):
+    pass
+
+
+MIN_FREE_GB = 0.8
+
+
+def _mem_available_gb() -> float:
+    try:
+        with open("/proc/meminfo") as f:
+            for line in f:
+                if line.startswith("MemAvailable:"):
+                    return int(line.split()[1]) / 1e6
+    except OSError:
+        pass
+    return float("inf")
+
+
+def _watch_memory(proc) -> None:
+    """Wait for the child; stop it before the kernel's out-of-memory killer acts.
+
+    The kernel may kill other processes too (in a cloud session, the session
+    itself), so we stop the child first when free memory gets low.
+    """
+    while proc.is_alive():
+        proc.join(timeout=1.0)
+        if proc.is_alive() and _mem_available_gb() < MIN_FREE_GB:
+            proc.kill()
+            proc.join()
+            proc._stopped_for_memory = True
 
 
 def _isolated(isolate: bool, fn_name: str, *args):
@@ -290,7 +338,11 @@ def _isolated(isolate: bool, fn_name: str, *args):
         out = Path(tmp) / "result.pkl"
         proc = mp.get_context("spawn").Process(target=_child_to_file, args=(fn_name, args, str(out)))
         proc.start()
-        proc.join()
+        _watch_memory(proc)
+        if getattr(proc, "_stopped_for_memory", False):
+            raise ChildOutOfMemory(f"{fn_name}: stopped, the machine was almost out of memory")
+        if proc.exitcode == -9:
+            raise ChildOutOfMemory(f"{fn_name}: killed by the system, out of memory")
         if proc.exitcode != 0 or not out.exists():
             hint = " (killed: probably out of memory)" if proc.exitcode == -9 else ""
             raise RuntimeError(f"{fn_name} failed in its process, exit code {proc.exitcode}{hint}")

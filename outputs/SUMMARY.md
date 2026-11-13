@@ -4,6 +4,10 @@ Static, one-year model on PolicyEngine US 2.107.4 and the Enhanced CPS 2024
 (tag 1.115.3), aged to 2026. People do not change behavior. All amounts are
 per year. Full tables and charts are in each folder's `report.html`.
 
+**See also `outputs/populace/SUMMARY.md`:** the same runs on PolicyEngine's
+Populace data, whose baseline is much closer to published totals (steady-state
+rate 34.40%, phase 1 23.11%).
+
 ## Key results
 
 | | Steady state | Phase 1 |
