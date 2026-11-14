@@ -40,6 +40,12 @@ Every number is in [`config.yaml`](config.yaml).
 * `custom`: every switch exactly as in the config. Add `custom: {ubi_min_age: 65}`
   for an age limit.
 
+## Design
+
+The full policy design, as decided after the first runs, is in
+[`docs/SPEC_v2.md`](docs/SPEC_v2.md). The model code does not yet follow all of
+it; Section 14 of that document lists the gaps.
+
 ## Set up
 
 ```bash
