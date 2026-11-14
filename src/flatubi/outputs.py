@@ -35,10 +35,16 @@ REMOVABLE_BENEFITS = ["snap", "tanf", "wic", "housing_assistance", "unemployment
 # --------------------------------------------------------------------------
 
 
+def is_v2(res: RunResult) -> bool:
+    return getattr(res.policy, "spec", "v1") == "v2"
+
+
 def flat_tax_base(res: RunResult) -> float:
     """Sum of w x (flat tax per unit of rate), in dollars. Linear in the rate."""
     r0 = res.policy.flat_rate
     p = res.reform.person
+    if is_v2(res):
+        return float((p.weight * p.flatubi_broad_income.clip(lower=0)).sum())
     if r0 > 0:
         return float((p.weight * p.flatubi_flat_tax).sum() / r0)
     return float((p.weight * p.flatubi_broad_income.clip(lower=0)).sum())
@@ -84,6 +90,8 @@ def with_rate(res: RunResult, rate: float) -> RunResult:
     recomputed (SPM resources need the full simulation), so poverty tables
     from this copy describe the rate of the original run.
     """
+    if is_v2(res):
+        return with_rate_v2(res, rate)
     out = copy.copy(res)
     out.reform = copy.copy(res.reform)
     r0 = res.policy.flat_rate
@@ -130,6 +138,8 @@ def corporate_rows(res: RunResult) -> tuple[float, float]:
 
 def budget_table(res: RunResult) -> pd.DataFrame:
     """Federal budget lines in $ billions: baseline, reform, difference."""
+    if is_v2(res):
+        return budget_table_v2(res)
     b, r = res.baseline.household, res.reform.household
     pol = res.policy
     corp_b, corp_r = corporate_rows(res)
@@ -182,6 +192,9 @@ def budget_table(res: RunResult) -> pd.DataFrame:
 def net_budget_effect(res: RunResult, rate: float | None = None) -> float:
     """Reform minus baseline (revenue minus spending), $ billions."""
     rate = res.policy.flat_rate if rate is None else rate
+    if is_v2(res):
+        t = budget_table_v2(with_rate_v2(res, rate, poverty=False), rounded=False).set_index("item")
+        return float(t.loc["Net budget effect (revenue minus spending)", "difference"])
     t = budget_table(res)
     at = t.set_index("item")
     base_effect = at.loc["Net budget effect (revenue minus spending)", "difference"]
@@ -602,6 +615,12 @@ def aggregate_checks(res: RunResult) -> pd.DataFrame:
 
 
 def reform_checks(res: RunResult) -> pd.DataFrame:
+    if is_v2(res):
+        return reform_checks_v2(res)
+    return reform_checks_v1(res)
+
+
+def reform_checks_v1(res: RunResult) -> pd.DataFrame:
     p = res.reform.person
     pol = res.policy
     adult = p.age >= pol.min_age_adult
@@ -647,3 +666,163 @@ def all_tables(res: RunResult) -> dict[str, Any]:
         tables["mtr_not_flat"] = mtr_not_flat(m, res.policy.flat_rate)
     tables["_frames"] = {"household": h, "person": p, "mtr": m}
     return tables
+
+
+# --------------------------------------------------------------------------
+# Spec v2
+# --------------------------------------------------------------------------
+
+
+def _person_tax_v2(p: pd.DataFrame, rate: float) -> pd.Series:
+    return rate * p.flatubi_broad_income.clip(lower=0) - p.flatubi_dividend_credit
+
+
+def with_rate_v2(res: RunResult, rate: float, poverty: bool = True) -> RunResult:
+    """Spec v2: recompute the flat tax, net income and SPM poverty at `rate`.
+
+    Nothing else in the v2 model depends on the rate: the UBI, the simple
+    EITC, the dividend credit and all programs are fixed, and no program
+    counts the flat tax. SPM resources move one for one with the flat tax,
+    so poverty is exact, not an estimate.
+    """
+    out = copy.copy(res)
+    out.reform = copy.copy(res.reform)
+    pp = res.reform.person.copy()
+    hh = res.reform.household.copy()
+    old = pp.flatubi_flat_tax
+    new = _person_tax_v2(pp, rate)
+    delta = new - old
+    pp["flatubi_flat_tax"] = new
+    d_hh = delta.groupby(pp.household_id.to_numpy()).sum()
+    d_hh = hh.household_id.map(d_hh).fillna(0).to_numpy()
+    for col in ["flat_tax", "flatubi_flat_tax", "household_tax"]:
+        if col in hh:
+            hh[col] = hh[col] + d_hh
+    hh["household_net_income"] = hh.household_net_income - d_hh
+    if poverty and getattr(res.reform, "spm", None) is not None:
+        spm = res.reform.spm.copy()
+        d_spm = delta.groupby(pp.spm_unit_id.to_numpy()).sum()
+        spm["resources"] = spm.resources - spm.spm_unit_id.map(d_spm).fillna(0).to_numpy()
+        poor = pd.Series((spm.resources < spm.threshold).to_numpy(), index=spm.spm_unit_id.to_numpy())
+        deep = pd.Series((spm.resources < 0.5 * spm.threshold).to_numpy(), index=spm.spm_unit_id.to_numpy())
+        pp["person_in_poverty"] = pp.spm_unit_id.map(poor).astype(float).to_numpy()
+        pp["in_deep_poverty"] = pp.spm_unit_id.map(deep).astype(float).to_numpy()
+        out.reform.spm = spm
+    out.reform.person = pp
+    out.reform.household = hh
+    out.policy = copy.copy(res.policy)
+    out.policy.flat_rate = rate
+    out.meta = dict(res.meta, rate_override=rate, poverty_at_rate=res.policy.flat_rate, poverty_recomputed=poverty)
+    return out
+
+
+def check_poverty_recompute(res: RunResult) -> float:
+    """Share of people whose recomputed poverty flag (at the run rate) differs
+    from PolicyEngine's. Should be 0."""
+    if getattr(res.reform, "spm", None) is None:
+        return float("nan")
+    again = with_rate_v2(res, res.policy.flat_rate)
+    a = again.reform.person.person_in_poverty.to_numpy() > 0
+    b = res.reform.person.person_in_poverty.to_numpy() > 0
+    w = res.reform.person.weight.to_numpy()
+    return float((w * (a != b)).sum() / w.sum())
+
+
+def budget_table_v2(res: RunResult, rounded: bool = True) -> pd.DataFrame:
+    b, r = res.baseline.household, res.reform.household
+    p = res.reform.person
+    pol = res.policy
+    c = pol.raw.get("corporate", {})
+    corp_base = float(c.get("profit_base_billions", 1600)) * BILLION
+    corp_b = float(c.get("baseline_rate", 0.21)) * corp_base
+    corp_r = pol.business_rate * corp_base
+    gross = float((p.weight * (pol.flat_rate * p.flatubi_broad_income.clip(lower=0))).sum())
+    credit = float((p.weight * p.flatubi_dividend_credit).sum())
+    ui_r = _total(r, "unemployment_compensation")
+    premium = 0.0
+    if pol.ui_factor < 1:
+        premium += ui_r
+    if pol.longrun:
+        premium += _total(r, "social_security")
+    notes = []
+
+    def line(group, item, cols):
+        vb, vr = _total(b, cols), _total(r, cols)
+        if np.isnan(vr) and not np.isnan(vb):
+            notes.append(item)
+            vr = vb
+            item = item + " (not computed; assumed unchanged)"
+        return (group, item, vb, vr)
+
+    rows = [
+        ("Revenue", "Federal income tax", _total(b, "income_tax"), _total(r, "income_tax")),
+        ("Revenue", "Payroll taxes (employee, employer, self-employment)", _total(b, FEDERAL_PAYROLL + EMPLOYER_PAYROLL), _total(r, FEDERAL_PAYROLL)),
+        ("Revenue", "Flat tax (before the dividend credit)", 0.0, gross),
+        ("Revenue", "Minus owner credit for business tax on dividends", 0.0, -credit),
+        ("Revenue", "Business tax at 21% (outside the microsimulation)", corp_b, corp_r),
+        ("Revenue", "Employer insurance premium (SSDI above the UBI, unemployment top-up)", 0.0, premium),
+    ]
+    spending = [
+        ("UBI (gross)", "basic_income"),
+        ("Simple EITC", "flatubi_simple_eitc"),
+        ("SNAP", "snap"),
+        ("TANF", "tanf"),
+        ("WIC", "wic"),
+        ("Housing assistance", "housing_assistance"),
+        ("ACA premium tax credits", "aca_ptc"),
+        ("Unemployment insurance", "unemployment_compensation"),
+        ("Social Security", "social_security"),
+        ("SSI", "ssi"),
+        ("Medicaid", "medicaid"),
+        ("CHIP", "chip"),
+        ("Medicare", "medicare_cost"),
+        ("School meals", ["free_school_meals", "reduced_price_school_meals"]),
+    ]
+    for label, cols in spending:
+        if isinstance(cols, str) and cols not in b:
+            rows.append(("Spending", label, 0.0, _total(r, cols)))
+        else:
+            rows.append(line("Spending", label, cols))
+    df = pd.DataFrame(rows, columns=["group", "item", "baseline", "reform"])
+    rev = df[df.group == "Revenue"][["baseline", "reform"]].sum()
+    spend = df[df.group == "Spending"][["baseline", "reform"]].sum()
+    totals = [
+        ("Total", "Total revenue", rev.baseline, rev.reform),
+        ("Total", "Total spending", spend.baseline, spend.reform),
+        ("Total", "Net budget effect (revenue minus spending)", rev.baseline - spend.baseline, rev.reform - spend.reform),
+    ]
+    memo = [
+        ("Memo", "EITC and CTC (baseline: inside income tax)", _total(b, ["eitc", "ctc"]), 0.0),
+        ("Memo", "State and local income tax (not in net budget)", _total(b, "household_state_income_tax"), _total(r, "household_state_income_tax")),
+        ("Memo", "Employer health premiums in the flat tax base", 0.0, float((p.weight * p.get("flatubi_employer_health", 0)).sum())),
+        ("Memo", "Taxable Social Security in the flat tax base", 0.0, float((p.weight * p.get("flatubi_taxable_social_security", 0)).sum())),
+        ("Memo", "Net transfer: UBI minus flat tax, where positive", 0.0, net_transfer(res)),
+    ]
+    df = pd.concat([df, pd.DataFrame(totals + memo, columns=df.columns)], ignore_index=True)
+    df[["baseline", "reform"]] = df[["baseline", "reform"]] / BILLION
+    df["difference"] = df.reform - df.baseline
+    return df.round(1) if rounded else df
+
+
+def reform_checks_v2(res: RunResult) -> pd.DataFrame:
+    p = res.reform.person
+    pol = res.policy
+    w = p.weight
+    groups = {
+        "Children (under 18)": p.age < pol.min_age_adult,
+        "Adults 18-64": (p.age >= pol.min_age_adult) & (p.age < pol.senior_age),
+        "Adults 65+": p.age >= pol.senior_age,
+    }
+    rows = []
+    elig = p.get("flatubi_ubi_eligible", pd.Series(1.0, index=p.index)).astype(float)
+    for name, m in groups.items():
+        rows.append(
+            {
+                "group": name,
+                "people_m": float(w[m].sum() / 1e6),
+                "eligible_pct": float(100 * (w[m] * elig[m]).sum() / w[m].sum()),
+                "ubi_billions": float((w[m] * p.flatubi_ubi[m]).sum() / BILLION),
+                "avg_ubi_eligible": float((w[m] * p.flatubi_ubi[m]).sum() / max((w[m] * elig[m]).sum(), 1)),
+            }
+        )
+    return pd.DataFrame(rows)

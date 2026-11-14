@@ -71,6 +71,10 @@ def resolve(cfg: dict[str, Any], scenario: str | None = None) -> Policy:
         (EITC, CTC) go, because the flat tax replaces the income tax.
     custom: every switch exactly as written in the config.
     """
+    if cfg.get("spec") == "v2":
+        from flatubi.config_v2 import resolve_v2
+
+        return resolve_v2(cfg, scenario)
     cfg = copy.deepcopy(cfg)
     scenario = scenario or cfg.get("scenario", "steady_state")
     if scenario not in SCENARIOS:

@@ -44,10 +44,40 @@ LIMITS = [
 ]
 
 
+def v2_text(pol) -> str:
+    if pol.scenario == "v2_phase1":
+        return ("Spec v2, phase 1: UBI for children and people 65+, floors for Social Security beneficiaries "
+                "(higher of benefit or UBI), Social Security taxed as under current law, simple automatic EITC, "
+                "programs kept, flat tax for all.")
+    if pol.longrun:
+        return ("Spec v2, long run: full UBI for all eligible people, Social Security gone except SSDI above "
+                "the UBI, SNAP, TANF, WIC, housing aid and the EITC gone, unemployment as a short top-up, ACA "
+                "credits kept.")
+    end = " This is the end of the schedule: SNAP, TANF, WIC and the EITC end; housing aid continues." if pol.step >= 5 else ""
+    return (f"Spec v2, phase 2 step {pol.step} of 5: adults 18-64 get a partial UBI of ${pol.working_age_ubi:,.0f}; "
+            f"employer health premiums {100 * pol.employer_health_share:.0f}% in the base; programs count the UBI; "
+            f"Social Security floors and current-law taxation continue.{end}")
+
+
+V2_LIMITS = [
+    ("Spec v2 approximations.", "The 5-year wait for permanent residents is not in the data (all are eligible). "
+     "Employer health premiums are imputed (Populace has none): average employer share for workers with "
+     "employer coverage. The simple EITC uses PolicyEngine's EITC formula (phase-out on income, not earnings only) "
+     "with full take-up. TANF, child care, Head Start and LIHEAP do not yet count the UBI. The unemployment "
+     "top-up is approximated as half of today's benefit. SSDI family members, the SSDI earnings taper, "
+     "inheritances, the owner credit for profit kept in pass-through businesses, the capital gains basis "
+     "adjustment, loss carry-forward and home-sale indexing are not modeled."),
+    ("Poverty at any rate.", "In spec v2 nothing but the flat tax depends on the rate, so SPM resources are "
+     "recomputed exactly at the revenue-neutral rate (checked against PolicyEngine at the run rate)."),
+]
+
+
 def limits(res, tables) -> list[tuple[str, str]]:
     """LIMITS plus the items that depend on the data used."""
     meta = res.meta
     out = list(LIMITS)
+    if getattr(res.policy, "spec", "v1") == "v2":
+        out = out + V2_LIMITS
     label = meta.get("dataset_label") or "Enhanced CPS 2024 (policyengine-us-data tag 1.115.3)"
     data_txt = f"{label}, survey year 2024, aged to {meta.get('year')} by PolicyEngine. Baseline totals differ from published totals; see the checks table."
     if "Enhanced CPS" in label:
@@ -281,7 +311,7 @@ def render_html(res, tables, solve) -> str:
         "steady_state": "Steady state: UBI for all ages, flat tax, programs removed, " + ("Social Security kept only above the UBI (max of benefit minus UBI, or zero)." if getattr(pol, "social_security_residual", False) else "Social Security removed."),
         "phase1": f"Phase 1: UBI for children and people {pol.ubi_min_age}+, Social Security offset (max of SS and UBI), working-age programs kept, flat tax for all.",
         "custom": "Custom: every switch as set in the config.",
-    }[pol.scenario]
+    }.get(pol.scenario) or v2_text(pol)
 
     kpis = [
         (f"{net:+,.0f} B", f"Net budget effect at {100 * pol.flat_rate:.2f}%{label}"),
@@ -334,7 +364,7 @@ def render_html(res, tables, solve) -> str:
     parts.append(
         f"<div class='chart'><img alt='SPM poverty' src='{chart_two_series(pt.group.str.replace(' (', chr(10) + '(', regex=False), pt.poverty_baseline, pt.poverty_reform, '', 'SPM poverty rate (%)')}'></div>"
     )
-    if res.meta.get("rate_override"):
+    if res.meta.get("rate_override") and not res.meta.get("poverty_recomputed"):
         parts.append("<p class='flag'>Poverty is at the run rate, not at the override rate.</p>")
     parts += [_fmt_table(pt), _fmt_table(tables["inequality"], digits=4)]
 

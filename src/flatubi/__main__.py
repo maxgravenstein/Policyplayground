@@ -17,6 +17,9 @@ from pathlib import Path
 import pandas as pd
 
 from flatubi.config import load_config
+from flatubi.config_v2 import V2_SCENARIOS
+
+SCENARIO_CHOICES = ["steady_state", "phase1", "custom", *V2_SCENARIOS]
 from flatubi.run import ROOT
 
 
@@ -57,8 +60,19 @@ def _finish(res, out_dir):
     """Tables, solver and report from a finished run (no simulation)."""
     from flatubi import outputs, report, solver
 
-    tables = outputs.all_tables(res)
     solve = solver.solve_rate(res)
+    if outputs.is_v2(res) and solve.converged:
+        # Spec v2: everything, including poverty, is exact at any rate, so all
+        # tables are at the revenue-neutral rate. The run-rate budget is kept.
+        run_budget = outputs.budget_table(res)
+        mismatch = outputs.check_poverty_recompute(res)
+        res = outputs.with_rate(res, solve.rate)
+        res.meta["poverty_check_mismatch"] = mismatch
+        tables = outputs.all_tables(res)
+        tables["budget_at_run_rate"] = run_budget
+        path = report.write_outputs(res, tables, solve, out_dir)
+        return tables, solve, path
+    tables = outputs.all_tables(res)
     if solve.converged:
         at = outputs.with_rate(res, solve.rate)
         h = outputs.household_frame(at)
@@ -171,14 +185,14 @@ def main(argv=None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     r = sub.add_parser("run", help="run one scenario and write outputs/<scenario>_<year>/")
     r.add_argument("--config", default="config.yaml")
-    r.add_argument("--scenario", choices=["steady_state", "phase1", "custom"])
+    r.add_argument("--scenario", choices=SCENARIO_CHOICES)
     r.add_argument("--no-mtr", action="store_true", help="skip marginal tax rates (faster)")
     r.add_argument("--flat-rate", type=float, help="override tax.flat_rate (e.g. 0.33)")
     r.add_argument("--output-name", help="write to <output_dir>/<output-name>/")
     r.set_defaults(fn=cmd_run)
     s = sub.add_parser("solve-rate", help="find the revenue-neutral flat rate")
     s.add_argument("--config", default="config.yaml")
-    s.add_argument("--scenario", choices=["steady_state", "phase1", "custom"])
+    s.add_argument("--scenario", choices=SCENARIO_CHOICES)
     s.add_argument("--target", type=float, default=None, help="net budget target, $ billions")
     s.set_defaults(fn=cmd_solve)
     c = sub.add_parser("compare", help="compare several configs")
@@ -186,7 +200,7 @@ def main(argv=None) -> int:
     c.set_defaults(fn=cmd_compare)
     rp = sub.add_parser("report", help="rebuild tables and report.html from the saved run")
     rp.add_argument("--config", default="config.yaml")
-    rp.add_argument("--scenario", choices=["steady_state", "phase1", "custom"])
+    rp.add_argument("--scenario", choices=SCENARIO_CHOICES)
     rp.set_defaults(fn=cmd_report)
     b = sub.add_parser("baseline-check", help="print baseline totals against published totals")
     b.add_argument("--config", default="config.yaml")

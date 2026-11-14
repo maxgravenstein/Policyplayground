@@ -75,10 +75,20 @@ PERSON_VARIABLES = [
 ]
 REFORM_PERSON_VARIABLES = ["flatubi_ubi", "flatubi_broad_income", "flatubi_flat_tax", "employer_sponsored_insurance_premiums"]
 REFORM_HOUSEHOLD_VARIABLES = ["flatubi_broad_income", "flatubi_flat_tax"]
+# Extracted only when the reform defines them (spec v2).
+OPTIONAL_REFORM_PERSON = [
+    "flatubi_dividend_credit",
+    "flatubi_taxable_social_security",
+    "flatubi_employer_health",
+    "flatubi_ubi_eligible",
+    "flatubi_ss_full",
+]
+OPTIONAL_REFORM_HOUSEHOLD = ["flatubi_simple_eitc", "flatubi_dividend_credit", "flatubi_employer_health", "aca_magi"]
 
 
 @dataclass
 class SimResult:
+    # spm: SPM-unit frame (reform, spec v2), set after construction.
     """Frames for one simulation (baseline or reform)."""
 
     person: pd.DataFrame
@@ -169,8 +179,34 @@ def extract(sim, year: int, reform: bool, log=print, hh_names=None, person_names
     pnames = person_names if person_names is not None else PERSON_VARIABLES + (REFORM_PERSON_VARIABLES if reform else [])
     for name in pnames:
         person[name] = _calc(sim, name, year, map_to="person")
+    spm = None
+    if reform and person_names is not None and "flatubi_flat_tax" in person_names:
+        known = sim.tax_benefit_system.variables
+        for name in OPTIONAL_REFORM_PERSON:
+            if name in known:
+                person[name] = _calc(sim, name, year, map_to="person")
+        for name in OPTIONAL_REFORM_HOUSEHOLD:
+            if name in known and "flatubi_simple_eitc" in known:
+                hh[name] = _calc(sim, name, year, map_to="household")
+        if "flatubi_simple_eitc" in known:
+            # v2: unemployment paid is total_unemployment_compensation (the
+            # top-up at the end of the schedule). Store it under the name the
+            # budget reads. In the baseline the two are equal.
+            hh["unemployment_compensation"] = _calc(sim, "total_unemployment_compensation", year, map_to="household")
+        # SPM units, so poverty can be recomputed at any flat rate.
+        person["spm_unit_id"] = _calc(sim, "person_spm_unit_id", year)
+        spm = pd.DataFrame(
+            {
+                "spm_unit_id": _calc(sim, "spm_unit_id", year),
+                "weight": _calc(sim, "spm_unit_weight", year),
+                "resources": _calc(sim, "spm_unit_net_income", year),
+                "threshold": _calc(sim, "spm_unit_spm_threshold", year),
+            }
+        )
     log(f"    done in {time.time() - t0:.0f}s")
-    return SimResult(pd.DataFrame(person), pd.DataFrame(hh), {"seconds": time.time() - t0})
+    out = SimResult(pd.DataFrame(person), pd.DataFrame(hh), {"seconds": time.time() - t0})
+    out.spm = spm
+    return out
 
 
 MTR_DELTA = 1_000.0
@@ -216,6 +252,10 @@ def add_mtr(result: SimResult, path: Path, policy: Policy | None, year: int, iso
 
 
 def _reform_class(policy: Policy | None):
+    if getattr(policy, "spec", "v1") == "v2":
+        from flatubi.reform.v2 import build_reform_v2
+
+        return build_reform_v2(policy)
     if policy is None:
         from flatubi.reform.datafix import DataFix
 
@@ -233,7 +273,7 @@ def simulate_part(path: str, policy: Policy | None, year: int, hh_names: list, p
     return extract(sim, year, reform=policy is not None, hh_names=hh_names, person_names=person_names)
 
 
-def simulate_frames(path: str, policy: Policy | None, year: int, isolate: bool = True) -> SimResult:
+def simulate_frames(path: str, policy: Policy | None, year: int, isolate: bool = True, skip=()) -> SimResult:
     """Baseline (policy None) or reform frames, from two simulations.
 
     The first computes net income, taxes, benefits and poverty; the second
@@ -253,6 +293,14 @@ def simulate_frames(path: str, policy: Policy | None, year: int, isolate: bool =
         (["free_school_meals", "reduced_price_school_meals"], []),
     ]
     for hh_group, p_group in groups:
+        if hh_group[0] in skip:
+            print(f"    health-cost values: {', '.join(hh_group)} skipped (config)", flush=True)
+            for c in hh_group:
+                main.household[c] = np.nan
+            for c in p_group:
+                main.person[c] = np.nan
+            main.meta["not_computed"] += hh_group
+            continue
         print(f"    health-cost values: {', '.join(hh_group)} (own simulation)", flush=True)
         try:
             part = _isolated(isolate, "simulate_part", path, policy, year, hh_group, p_group)
@@ -363,6 +411,10 @@ def _baseline_cache_key(path: Path, year: int, mtr: bool) -> str:
     return hashlib.sha1(json.dumps(info, sort_keys=True).encode()).hexdigest()[:12]
 
 
+def _skip(cfg: dict[str, Any]) -> tuple:
+    return ("medicaid",) if cfg.get("run", {}).get("skip_medicaid") else ()
+
+
 def _isolate(cfg: dict[str, Any]) -> bool:
     return bool(cfg.get("run", {}).get("isolate_simulations", True))
 
@@ -377,7 +429,7 @@ def run_baseline(cfg: dict[str, Any], year: int, mtr: bool = True, log=print) ->
         with open(cache, "rb") as f:
             return pickle.load(f)
     log("  baseline: simulate current law")
-    result = simulate_frames(str(path), None, year, _isolate(cfg))
+    result = simulate_frames(str(path), None, year, _isolate(cfg), _skip(cfg))
     if mtr:
         add_mtr(result, path, None, year, isolate=_isolate(cfg), log=log)
     with open(cache, "wb") as f:
@@ -388,7 +440,7 @@ def run_baseline(cfg: dict[str, Any], year: int, mtr: bool = True, log=print) ->
 def run_reform(cfg: dict[str, Any], policy: Policy, mtr: bool = True, log=print) -> SimResult:
     path = dataset_path(cfg)
     log(f"  reform: simulate {policy.scenario}")
-    result = simulate_frames(str(path), policy, policy.year, _isolate(cfg))
+    result = simulate_frames(str(path), policy, policy.year, _isolate(cfg), _skip(cfg))
     if mtr:
         add_mtr(result, path, policy, policy.year, isolate=_isolate(cfg), log=log)
     return result
