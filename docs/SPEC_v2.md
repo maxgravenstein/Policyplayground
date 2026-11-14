@@ -171,9 +171,22 @@ get more without a separate age ramp.
 
 ### 5.2a Railroad retirement
 
-The railroad retirement payroll taxes are removed with the other payroll
-taxes. **Decided** (2026-11-14). Tier 1 railroad benefits (the Social
-Security equivalent) follow the Social Security rules in this section.
+Rail workers are not in Social Security. The Railroad Retirement Board pays
+two tiers. **Decided** (2026-11-14):
+
+| Part | Rule | Status |
+|---|---|---|
+| Railroad retirement payroll taxes (Tier 1 and Tier 2, sections 3201-3241) | Removed, with the other payroll taxes | Decided |
+| **Tier 1** (the Social Security equivalent) | Follows the Social Security rules in this section: phase 1 floors, current-law taxation, wind-down | Decided |
+| **Tier 2** (an extra pension for rail service) | Becomes a **private industry pension** | Decided |
+| Tier 2 already earned | Protected. Paid first from the National Railroad Retirement Investment Trust, then as a pension obligation of the industry plan. | Decided |
+| Tier 2 for future rail service | Earned in the private industry plan, funded by employer and worker contributions outside the tax code, like any private pension | Decided |
+| Tax on Tier 2 payments | Taxed at the flat rate when paid, like other pensions | Decided |
+| "Higher of" rule | Only Tier 1 counts as Social Security; Tier 2 is a pension and is not offset by the UBI | Decided |
+
+Open details: who takes over the trust fund and its governance, and pension
+insurance for the new plan (for example, coverage by the Pension Benefit
+Guaranty Corporation). See Section 13.
 
 ### 5.3 Tax on Social Security (phase 1 and legacy benefits)
 
@@ -442,8 +455,8 @@ All proposals are decided (2026-11-14). Left for later:
 2. Public housing buildings (9.2).
 3. SSI marriage penalty (7.2).
 4. Unemployment top-up: exact cap, trigger and start date (7.4).
-5. Tier 2 railroad retirement benefits (the private-pension-like part):
-   wind down like Social Security, or another rule (5.2a).
+5. Tier 2 railroad pension: who takes over the trust fund, its governance,
+   and pension insurance for the new private plan (5.2a).
 6. How the affordable housing money is split among states (today's
    Low-Income Housing Tax Credit formula, per person, is the simple default)
    (8.4, 9.3).
