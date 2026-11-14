@@ -23,6 +23,8 @@ same formula as the HHS poverty guideline (consumer prices, CPI-U).
    with a credit, so it is taxed once.
 3. **No carve-outs.** No deductions for people; for businesses, only credits
    that prevent double tax, reduce negative externalities, or fund research.
+   Exceptions kept on purpose: 529-like savings accounts (education, ABLE,
+   Coverdell, children's accounts) and tax-exempt state and local bonds.
 4. **Payments from the government are not taxed** (UBI, EITC in the transition).
    Legacy Social Security is taxed as under current law.
 5. **"Higher of" rule** for earnings-based benefits that remain (Social Security
@@ -87,7 +89,8 @@ same formula as the HHS poverty guideline (consumer prices, CPI-U).
 Taxed at the flat rate:
 - wages and salaries, including 401(k) and other pre-tax deferrals
 - self-employment income; owner payouts from businesses (Section 8)
-- all interest, including today's tax-exempt interest
+- all interest, **except** interest on state and local bonds, which stays
+  tax-exempt (decided 2026-11-14)
 - dividends (with the business credit, Section 8)
 - capital gains, at the same rate as wages (gains on shares only above the
   company's taxed retained profit, Section 8.3)
@@ -101,6 +104,14 @@ Taxed at the flat rate:
 
 Not taxed: the UBI, SSI, the EITC, and other government payments listed as
 untaxed in this spec.
+
+Kept as today (decided 2026-11-14):
+- **529-like savings accounts:** education savings plans (529), ABLE accounts
+  for disabled people (529A), Coverdell education savings accounts (530), and
+  the children's accounts (530A). Earnings and qualified withdrawals stay
+  untaxed. Contributions are made from income that was already taxed.
+- **Tax-exempt bonds:** interest on state and local bonds stays tax-exempt,
+  with today's private activity bond rules.
 
 ### 4.3 Retirement accounts
 
@@ -157,6 +168,12 @@ The payroll tax ends, so nobody earns new Social Security after the reform.
 
 Note: the earned part ramps up by itself with years paid in, so older workers
 get more without a separate age ramp.
+
+### 5.2a Railroad retirement
+
+The railroad retirement payroll taxes are removed with the other payroll
+taxes. **Decided** (2026-11-14). Tier 1 railroad benefits (the Social
+Security equivalent) follow the Social Security rules in this section.
 
 ### 5.3 Tax on Social Security (phase 1 and legacy benefits)
 
@@ -269,6 +286,11 @@ more Social Security taxed than today.
 | Reasonable salary safe rule | An owner who pays themselves at least the lower of the business profit or about twice the median wage is not challenged; above that, a market-salary test (as for S-corporations today) | Decided |
 | Full expensing | Not added; today's depreciation rules stay | Decided |
 
+
+### 8.3a Corporate minimum tax
+
+The corporate minimum tax on large companies' book income stays as today. Only
+the individual AMT is removed. **Decided** (2026-11-14).
 
 ### 8.4 Business tax credits and preferences
 
@@ -420,7 +442,9 @@ All proposals are decided (2026-11-14). Left for later:
 2. Public housing buildings (9.2).
 3. SSI marriage penalty (7.2).
 4. Unemployment top-up: exact cap, trigger and start date (7.4).
-5. How the affordable housing money is split among states (today's
+5. Tier 2 railroad retirement benefits (the private-pension-like part):
+   wind down like Social Security, or another rule (5.2a).
+6. How the affordable housing money is split among states (today's
    Low-Income Housing Tax Credit formula, per person, is the simple default)
    (8.4, 9.3).
 
@@ -470,6 +494,8 @@ One-year snapshots (2026 population, static):
 | SSDI | Removed with Social Security in the steady state | Above the UBI, with family floors |
 | Employer insurance premium | None | Revenue line |
 | Medicare | PolicyEngine eligibility | Everyone 65+ (small effect) |
+| Tax-exempt bond interest | In the flat tax base (all interest) | Out of the base |
+| 529-like accounts | Not in the data | No model change needed |
 | Capital gains basis adjustment for retained business profit | None | Cannot be modeled with the data; note as a limit |
 
 ### 14.4 Order of work (when asked)

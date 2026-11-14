@@ -18,25 +18,25 @@ Measured on 2026-11-14 from the official text of Title 26 (the Internal Revenue 
 
 | Category | Sections | Words | Share of law in force |
 |---|---|---|---|
-| Removed | 277 | 328,830 | 18.7% |
-| Changed | 166 | 211,651 | 12.0% |
-| Kept | 1,457 | 1,219,067 | 69.3% |
+| Removed | 263 | 280,418 | 15.9% |
+| Changed | 165 | 209,281 | 11.9% |
+| Kept | 1,472 | 1,269,849 | 72.2% |
 | Added (estimate) | - | 35,000 to 61,100 | 2.0% to 3.5% |
 
-**Net effect (conservative):** from 1,759,548 words in force to about 1,465,718 to 1,491,818 words: **15% to 17% smaller.**
+**Net effect (conservative):** from 1,759,548 words in force to about 1,514,130 to 1,540,230 words: **12% to 14% smaller.**
 
-If half of the text in changed sections also goes (a plausible outcome), the code is about **23% smaller.**
+If half of the text in changed sections also goes (a plausible outcome), the code is about **20% smaller.**
 
 ## What is removed, by area
 
 | Area | Sections | Words |
 |---|---|---|
 | Business credits and preferences | 52 | 81,023 |
-| Exclusions from income and tax-exempt bonds (carve-outs) | 48 | 76,255 |
 | Individual income tax: rates, filing status, deductions, exemptions, personal credits | 43 | 68,027 |
 | Payroll taxes (FICA, self-employment, 3.8% investment tax, railroad, federal unemployment) | 42 | 53,255 |
 | Estate, gift and generation-skipping taxes | 92 | 50,270 |
-| **Total removed** | **277** | **328,830** |
+| Exclusions from income (carve-outs) | 34 | 27,843 |
+| **Total removed** | **263** | **280,418** |
 
 ## Largest removed sections
 
@@ -44,19 +44,19 @@ If half of the text in changed sections also goes (a plausible outcome), the cod
 |---|---|---|
 | 42 | Low-income housing credit | 15,136 |
 | 3121 | Definitions | 12,959 |
-| 143 | Mortgage revenue bonds: qualified mortgage bond and qualified veterans’ mortgage bond | 7,735 |
-| 142 | Exempt facility bond | 7,298 |
 | 3306 | Definitions | 6,489 |
 | 1 | Tax imposed | 5,804 |
-| 148 | Arbitrage | 5,772 |
 | 2032A | Valuation of certain farm, etc., real property | 5,225 |
 | 1402 | Definitions | 4,858 |
 | 220 | Archer MSAs | 4,671 |
 | 199A | Qualified business income | 4,605 |
 | 30B | Alternative motor vehicle credit | 4,600 |
 | 223 | Health savings accounts | 4,228 |
-| 144 | Qualified small issue bond; qualified student loan bond; qualified redevelopment bond | 4,179 |
 | 1202 | Partial exclusion for gain from certain small business stock | 4,160 |
+| 51 | Amount of credit | 4,051 |
+| 45X | Advanced manufacturing production credit | 3,817 |
+| 613A | Limitations on percentage depletion in case of oil and gas wells | 3,617 |
+| 3302 | Credits against tax | 3,488 |
 
 ## Largest changed sections (kept, but rewritten)
 
@@ -93,7 +93,7 @@ If half of the text in changed sections also goes (a plausible outcome), the cod
 
 | Subtitle | Today (words) | After (kept + changed) | Change |
 |---|---|---|---|
-| A. Income Taxes | 1,071,830 | 838,476 | -22% |
+| A. Income Taxes | 1,071,830 | 886,888 | -17% |
 | B. Estate and Gift Taxes | 50,431 | 0 | -100% |
 | C. Employment Taxes | 64,348 | 16,990 | -74% |
 | D. Miscellaneous Excise Taxes | 104,497 | 104,038 | -0% |
@@ -109,17 +109,20 @@ The new text is not in this table. Most of it goes into Subtitle A (business tax
 
 ## What this means
 
-1. **The statute shrinks by about 15-25%, not by half.** About 70% of the code is business, international, retirement-plan, excise and procedure law that the reform keeps.
+1. **The statute shrinks by about 12-20%, not by half.** About 72% of the code is business, international, retirement-plan, excise and procedure law that the reform keeps.
 2. **The part that households deal with almost disappears:** brackets, filing status, deductions, personal credits, payroll and self-employment taxes, and the estate and gift taxes.
 3. **The bigger saving is in compliance, not pages.** With one flat rate withheld at source and no deductions, most wage earners and retirees would not need to file a return. Returns remain for business income, capital gains and inheritances.
 4. **Business complexity stays about the same.** The 21% tax on pass-throughs, the owner credit and franking accounts add text for partnerships and S corporations.
 5. **Word counts are only a proxy.** A short section can be hard to apply, and a long one easy. Regulations, which are much longer than the statute, would shrink in proportion for the removed areas.
 
-## Judgment calls to check
+## Decisions applied (2026-11-14)
 
-- **ABLE accounts for disabled people (529A):** marked changed, not removed. Under 'no carve-outs' they would go; that hurts disabled savers. A decision for you.
-- **Railroad retirement tax (3201-3241):** assumed to go with the other payroll taxes. The spec does not mention it.
-- **Private activity bonds (141-150):** removed, because bond interest becomes taxable. State and local governments would pay more to borrow.
-- **Corporate minimum tax:** kept (only the individual AMT goes). The spec does not mention it.
+- **Kept:** ABLE accounts (529A), education savings plans (529), Coverdell accounts (530) and the children's accounts (530A), with their tax benefits.
+- **Kept:** tax-exempt interest on state and local bonds (103) and the private activity bond rules (141-150).
+- **Kept:** the corporate minimum tax. Only the individual AMT goes.
+- **Removed:** the railroad retirement payroll tax (3201-3241).
+
+## Other judgment calls
+
 - **Excise taxes, procedure, health plan rules:** kept, because the spec does not change them.
 - **Exclusions (101-140):** most removed as carve-outs. A few that cover government payments (disaster relief, foster care, cost-sharing) are kept, consistent with 'government payments are not taxed'.

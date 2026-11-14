@@ -16,7 +16,7 @@ AREAS = [
     ("Individual income tax: rates, filing status, deductions, exemptions, personal credits", [
         ("1", "5"), ("21", "37"), ("62", "63"), ("67", "68"), ("151", "153"), ("211", "226"), ("1301", "1301"),
     ]),
-    ("Exclusions from income and tax-exempt bonds (carve-outs)", [
+    ("Exclusions from income (carve-outs)", [
         ("101", "150"), ("529", "530A"), ("1202", "1202"),
     ]),
     ("Payroll taxes (FICA, self-employment, 3.8% investment tax, railroad, federal unemployment)", [
@@ -155,8 +155,9 @@ def main(src, out):
              "replaces Subtitle B (inheritances) and part of Subtitle C (employer premium).\n")
 
     L.append("## What this means\n")
-    L.append("1. **The statute shrinks by about 15-25%, not by half.** About 70% of the code is business, "
-             "international, retirement-plan, excise and procedure law that the reform keeps.")
+    L.append(f"1. **The statute shrinks by about {100 * (1 - new_hi / base):.0f}-{100 * (1 - new_lo_half / base):.0f}%, "
+             f"not by half.** About {100 * kept / base:.0f}% of the code is business, international, "
+             "retirement-plan, excise and procedure law that the reform keeps.")
     L.append("2. **The part that households deal with almost disappears:** brackets, filing status, "
              "deductions, personal credits, payroll and self-employment taxes, and the estate and gift taxes.")
     L.append("3. **The bigger saving is in compliance, not pages.** With one flat rate withheld at source and "
@@ -168,14 +169,14 @@ def main(src, out):
              "Regulations, which are much longer than the statute, would shrink in proportion for the removed "
              "areas.\n")
 
-    L.append("## Judgment calls to check\n")
-    L.append("- **ABLE accounts for disabled people (529A):** marked changed, not removed. Under 'no carve-outs' "
-             "they would go; that hurts disabled savers. A decision for you.")
-    L.append("- **Railroad retirement tax (3201-3241):** assumed to go with the other payroll taxes. The spec "
-             "does not mention it.")
-    L.append("- **Private activity bonds (141-150):** removed, because bond interest becomes taxable. State and "
-             "local governments would pay more to borrow.")
-    L.append("- **Corporate minimum tax:** kept (only the individual AMT goes). The spec does not mention it.")
+    L.append("## Decisions applied (2026-11-14)\n")
+    L.append("- **Kept:** ABLE accounts (529A), education savings plans (529), Coverdell accounts (530) and the "
+             "children's accounts (530A), with their tax benefits.")
+    L.append("- **Kept:** tax-exempt interest on state and local bonds (103) and the private activity bond rules "
+             "(141-150).")
+    L.append("- **Kept:** the corporate minimum tax. Only the individual AMT goes.")
+    L.append("- **Removed:** the railroad retirement payroll tax (3201-3241).\n")
+    L.append("## Other judgment calls\n")
     L.append("- **Excise taxes, procedure, health plan rules:** kept, because the spec does not change them.")
     L.append("- **Exclusions (101-140):** most removed as carve-outs. A few that cover government payments "
              "(disaster relief, foster care, cost-sharing) are kept, consistent with 'government payments are "
