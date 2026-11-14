@@ -1,6 +1,6 @@
 # Spec v2: Flat Tax + UBI, full design
 
-Status: design decisions as of 2026-11-14. This document replaces the original
+Status: design decisions as of 2026-11-14 (all proposals confirmed). This document replaces the original
 spec (v1, in the first request) as the reference for the **policy**. The model
 code does not yet follow it; see Section 14.
 
@@ -87,7 +87,8 @@ Taxed at the flat rate:
 - self-employment income; owner payouts from businesses (Section 8)
 - all interest, including today's tax-exempt interest
 - dividends (with the business credit, Section 8)
-- capital gains, at the same rate as wages
+- capital gains, at the same rate as wages (gains on shares only above the
+  company's taxed retained profit, Section 8.3)
 - pensions and withdrawals from pre-reform retirement balances (4.3)
 - rent and all other income
 - **employer-paid health insurance premiums**, phased in: 20% of the premium at
@@ -134,7 +135,8 @@ the flat tax. **Decided.**
 | People 65+ on Social Security | Higher of benefit or UBI: UBI top-up = max($15,960 - benefit, 0) | Decided |
 | Survivor and dependent beneficiaries, any age | Higher of benefit or own UBI (children $3,000, adults $15,960) | Decided |
 | SSDI beneficiaries, any age | Same floor: higher of benefit or $15,960 | Decided |
-| Early retirement, 62-64 | Benefit as today; no UBI until 65 (or phase 2) | Proposed (normal age cut-off) |
+| Early retirement, 62-64, already receiving benefits at passage | Same floor: higher of benefit or $15,960 | Decided |
+| Early retirement, 62-64, claiming after passage | Benefit as today; no floor until 65 (avoids early claiming just to get the floor) | Decided |
 | Tax | Current-law rules, per person (5.3) | Decided |
 
 ### 5.2 Wind-down (no new benefits earned after the reform)
@@ -253,17 +255,17 @@ more Social Security taxed than today.
 | Interest, dividends and rents earned inside a business pay the flat rate at once | Decided |
 | Simple option: sole owners and very small businesses skip the business tax and pay the flat rate on their profit directly | Decided |
 
-### 8.3 Details to confirm
+### 8.3 Details
 
 | Item | Proposal | Status |
 |---|---|---|
-| Credit only for tax actually paid | Each business tracks the U.S. tax it paid and can attach credits to payouts only up to that amount (a "franking account", as in Australia) | Proposed |
-| Unused credit | Refunded | Proposed |
-| Foreign owners and tax-free retirement accounts | No credit; the 21% is final | Proposed |
-| Capital gains on shares | Accept the partial double tax for now (21% inside the business, flat rate on the gain at sale) | Proposed |
-| Small business limit for the simple option | Sole owners, and businesses with up to about $1 million revenue, indexed | Proposed |
-| Reasonable salary safe rule | An owner who pays themselves at least the lower of the business profit or about twice the median wage is not challenged; above that, a market-salary test (as for S-corporations today) | Proposed |
-| Full expensing | Not added; today's depreciation rules stay | Proposed |
+| Credit only for tax actually paid | Each business tracks the U.S. tax it paid and can attach credits to payouts only up to that amount (a "franking account", as in Australia) | Decided |
+| Unused credit | Refunded | Decided |
+| Foreign owners and tax-free retirement accounts | No credit; the 21% is final | Decided |
+| Capital gains on shares | No double tax: each year, brokers add the company's taxed retained profit per share to the shareholder's cost basis; on sale, only the gain above that is taxed. Companies report taxed retained profit per share. | Decided |
+| Small business limit for the simple option | Sole owners, and businesses with up to about $1 million revenue, indexed | Decided |
+| Reasonable salary safe rule | An owner who pays themselves at least the lower of the business profit or about twice the median wage is not challenged; above that, a market-salary test (as for S-corporations today) | Decided |
+| Full expensing | Not added; today's depreciation rules stay | Decided |
 
 ---
 
@@ -296,7 +298,7 @@ more Social Security taxed than today.
 | Programs that count the UBI as income | All income-tested programs, **except** SSI and Medicaid | Decided |
 | Medicaid | Does not count the UBI (avoids the 138% of poverty cliff) | Decided |
 | Medicare | For everyone 65+, no 40-quarter work requirement | Decided |
-| Medicare for noncitizens | Same eligibility as the UBI (citizens and qualified residents) | Proposed |
+| Medicare for noncitizens | Same eligibility as the UBI (citizens and qualified residents). Noncitizens already on Medicare at passage keep it. | Decided |
 | ACA credits | Kept permanently, counting the UBI (option A). A Medicaid buy-in with a sliding premium is a possible later reform. | Decided |
 | Housing aid | Last new voucher in year 18 after passage; current families keep vouchers while eligible | Decided |
 | Public housing buildings | Plan needed (sell, convert, or keep as low-rent housing) | Open |
@@ -383,21 +385,11 @@ Security removed in the steady state).
 
 ## 13. Open items
 
-Confirm (proposed in this document):
-1. Business credit details (8.3): credit only for tax paid; refunds; no
-   credit for foreign owners and tax-free accounts; accept the partial double
-   tax on capital gains.
-2. Small business limit for the simple option (8.3).
-3. Reasonable salary safe rule (8.3).
-4. Early retirement 62-64 in phase 1 (5.1).
-5. Full expensing not added (8.3).
-6. Medicare eligibility for noncitizens: same as the UBI (9.2).
-
-Later:
-7. Cost-of-living fund details (9.3).
-8. Public housing buildings (9.2).
-9. SSI marriage penalty (7.2).
-10. Unemployment top-up: exact cap, trigger and start date (7.4).
+All proposals are decided (2026-11-14). Left for later:
+1. Cost-of-living fund details (9.3).
+2. Public housing buildings (9.2).
+3. SSI marriage penalty (7.2).
+4. Unemployment top-up: exact cap, trigger and start date (7.4).
 
 ---
 
@@ -442,6 +434,7 @@ One-year snapshots (2026 population, static):
 | SSDI | Removed with Social Security in the steady state | Above the UBI, with family floors |
 | Employer insurance premium | None | Revenue line |
 | Medicare | PolicyEngine eligibility | Everyone 65+ (small effect) |
+| Capital gains basis adjustment for retained business profit | None | Cannot be modeled with the data; note as a limit |
 
 ### 14.4 Order of work (when asked)
 
