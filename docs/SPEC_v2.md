@@ -21,15 +21,17 @@ same formula as the HHS poverty guideline (consumer prices, CPI-U).
 2. **One rate, taxed once.** All personal income pays one flat rate. Business
    profit pays 21% at the business and the rest of the flat rate at the owner,
    with a credit, so it is taxed once.
-3. **Payments from the government are not taxed** (UBI, EITC in the transition).
+3. **No carve-outs.** No deductions for people; for businesses, only credits
+   that prevent double tax, reduce negative externalities, or fund research.
+4. **Payments from the government are not taxed** (UBI, EITC in the transition).
    Legacy Social Security is taxed as under current law.
-4. **"Higher of" rule** for earnings-based benefits that remain (Social Security
+5. **"Higher of" rule** for earnings-based benefits that remain (Social Security
    in transition, SSDI): a person gets the higher of the benefit or their UBI.
-5. **Gradual transition** on a fixed, announced schedule with a safety check.
+6. **Gradual transition** on a fixed, announced schedule with a safety check.
    Old programs shrink by themselves because they count the UBI as income.
-6. **Protect people who relied on the old rules:** retirees, people near
+7. **Protect people who relied on the old rules:** retirees, people near
    retirement, survivors, dependents, disabled workers.
-7. **Simple administration:** no tax return needed just to get the UBI; flat
+8. **Simple administration:** no tax return needed just to get the UBI; flat
    tax withheld at source; benefits paid automatically from data the
    government already has.
 
@@ -267,6 +269,32 @@ more Social Security taxed than today.
 | Reasonable salary safe rule | An owner who pays themselves at least the lower of the business profit or about twice the median wage is not challenged; above that, a market-salary test (as for S-corporations today) | Decided |
 | Full expensing | Not added; today's depreciation rules stay | Decided |
 
+
+### 8.4 Business tax credits and preferences
+
+Rule: remove business tax credits and preferences, except credits that
+prevent double tax, credits that significantly reduce negative externalities
+(pollution, emissions), and research credits (positive externality).
+**Decided** (2026-11-14).
+
+| Credit or preference | Rule | Status |
+|---|---|---|
+| Foreign tax credit | **Keep** (prevents double tax on profit earned abroad) | Decided |
+| Owner credit for the 21% business tax | **Keep** (Section 8.1) | Decided |
+| Research and development credit | **Keep** (research benefits others: a positive externality) | Decided |
+| Orphan drug credit (research on rare diseases) | **Keep**, with the R&D credit | Decided |
+| Clean electricity production and investment credits (45Y, 48E) | **Keep** | Decided |
+| Nuclear production credit (45U) | **Keep** | Decided |
+| Carbon capture credit (45Q) | **Keep for permanent storage only**; no credit when the CO2 is used to produce more oil | Decided |
+| Clean fuel production credit (45Z) | Keep only if it pays on measured lifecycle emissions; otherwise remove | Decided |
+| Advanced manufacturing credit (45X) | Remove (industrial policy) | Decided |
+| Energy-efficient building credits and deductions (45L, 179D), any remaining vehicle credits | Remove | Decided |
+| Fossil fuel preferences: percentage depletion (oil, gas, coal), immediate write-off of drilling costs, enhanced oil recovery credit, marginal well credit | Remove (they increase a negative externality) | Decided |
+| Work Opportunity Credit, New Markets credit, empowerment zones, Indian employment credit, historic rehabilitation credit, employer child care credit, paid leave credit, disabled access credit, small business health care credit, tip (FICA) credit | Remove | Decided |
+| Low-Income Housing Tax Credit | **Remove from the tax code.** The same amount each year (about $14 billion, indexed) goes to the states' cost-of-living funds, restricted to affordable housing (Section 9.3). | Decided |
+| Carbon fee (a charge per ton of CO2, with the revenue used to lower the flat rate or paid out with the UBI) | Not now; a possible later reform | Decided |
+| New credits in future | Must meet the same test: reduce a negative externality, or fund research | Decided |
+
 ---
 
 ## 9. Programs
@@ -313,6 +341,7 @@ except in schools that serve free meals to all pupils.
 |---|---|---|
 | State income taxes | States define their own base; they may adopt the federal flat tax base | Decided |
 | State savings from programs that shrink (TANF required spending, SNAP admin and cost share, and similar) | States keep the savings in a **cost-of-living fund** with restricted spending | Decided |
+| Federal money for affordable housing | The amount of the removed Low-Income Housing Tax Credit (about $14 billion a year, indexed) goes to the cost-of-living funds, restricted to affordable housing (Section 8.4) | Decided |
 | Allowed uses, duration and reporting of the fund | Later | Open |
 | State EITCs built on the federal EITC | States redesign them | Decided (states decide) |
 | Medicaid and CHIP cost-sharing | Unchanged | Decided |
@@ -376,6 +405,7 @@ with model results.
 | Simple EITC | about $70B a year, declining in phase 2 |
 | SSDI above the UBI | about $25-40B a year |
 | Employer insurance premium | about 0.5-0.6% of wages |
+| Removing business credits and fossil fuel preferences (Section 8.4) | saves roughly $70-100B a year, about 0.3-0.5 points of rate |
 
 Earlier model results (for reference, on the original spec): phase 1
 revenue-neutral at 23.11% and steady state at 34.40% (Populace data, Social
@@ -390,6 +420,9 @@ All proposals are decided (2026-11-14). Left for later:
 2. Public housing buildings (9.2).
 3. SSI marriage penalty (7.2).
 4. Unemployment top-up: exact cap, trigger and start date (7.4).
+5. How the affordable housing money is split among states (today's
+   Low-Income Housing Tax Credit formula, per person, is the simple default)
+   (8.4, 9.3).
 
 ---
 
@@ -414,6 +447,9 @@ One-year snapshots (2026 population, static):
 - The business credit in detail (who owns which shares); the model can only
   approximate it with a share of dividends.
 - Medicaid totals on Populace data on a 15 GB machine.
+- Business tax credits and preferences (Section 8.4): PolicyEngine models
+  household taxes, not business returns. Their effect enters only as an
+  estimate.
 
 ### 14.3 Code changes needed to match this spec
 
