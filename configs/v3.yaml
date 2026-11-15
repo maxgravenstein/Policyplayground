@@ -1,0 +1,74 @@
+# Spec v3 (docs/SPEC_v3.md) on Populace data. Uses the v2 model code with the
+# v3 rules switched on by the "v3_" stage names.
+# Run one stage:  python -m flatubi run --config configs/v3.yaml --scenario v3_phase1
+# Stages: v3_phase1, v3_step1 ... v3_step5 (end of the schedule), v3_longrun
+# Step 5 and the long run have the same rules as in v2.
+# Outputs: outputs/v3/<scenario>_2026/
+spec: v2
+year: 2026
+scenario: v3_phase1
+output_dir: outputs/v3
+
+ubi:
+  adult_annual: 15960          # 2026 HHS poverty guideline, one person
+  child_annual: 3000
+  min_age_adult: 18
+  senior_age: 65               # full UBI (with Social Security floor) in phase 1
+  steps: 5                     # phase 2: adults 18-64 get adult_annual x step / steps
+  # Citizens and lawful permanent residents (5-year wait not in the data),
+  # refugees, asylees and similar SNAP-qualified groups.
+  eligible_statuses: [CITIZEN, LEGAL_PERMANENT_RESIDENT, REFUGEE, ASYLEE, DEPORTATION_WITHHELD, CUBAN_HAITIAN_ENTRANT, CONDITIONAL_ENTRANT, PAROLED_ONE_YEAR]
+
+tax:
+  # Starting guesses only. The solver finds the revenue-neutral rate, and all
+  # report tables (including poverty) are computed at that rate.
+  flat_rate_by_scenario:
+    v3_phase1: 0.29
+    v3_step1: 0.30
+    v3_step2: 0.32
+    v3_step3: 0.34
+    v3_step4: 0.355
+    v3_step5: 0.37
+    v3_longrun: 0.34
+  flat_rate: 0.30
+  business_rate: 0.21          # all businesses; owners get a credit (dividends modeled)
+  social_security_thresholds: [25000, 34000]   # current law, per person
+  # Populace has no employer health premiums. Impute them for workers with
+  # employer coverage, scaled to this 2026 total (Enhanced CPS, $1.24T).
+  employer_health_family_to_single: 2.6
+  # Unscaled imputation (single $8,400, family 2.6x) gives $1,857B on Populace
+  # in 2026; scale to the Enhanced CPS total of $1,240B: 1240 / 1857.2.
+  employer_health_impute_scale: 0.6677
+
+v3:
+  earnings_exemption: 16100     # phase 1; shrinks 20% per step, 0 at step 5 (spec v3 4.7)
+  eitc_offset_share: 0.5        # phase 2 EITC reduced by half of the partial UBI (spec v3 6)
+
+ssi:
+  asset_limit_individual: 6000
+  asset_limit_couple: 9000
+
+unemployment:
+  topup_factor: 0.5            # top-up (50% of lost wages, 13 weeks) vs today, rough
+
+corporate:
+  profit_base_billions: 1600
+  baseline_rate: 0.21
+
+solver:
+  target_net_budget_billions: 0
+
+behavior:
+  enabled: false
+
+data:
+  label: "Populace US 2024 (build populace-us-2024-spm-20260909, pinned by policyengine-us 2.107.4)"
+  repo: policyengine/populace-us
+  repo_type: dataset
+  file: populace_us_2024.h5
+  revision: populace-us-2024-spm-20260909
+  path: data/populace/populace_us_2024.h5
+
+run:
+  isolate_simulations: true
+  skip_medicaid: true          # needs more memory than 15 GB on Populace

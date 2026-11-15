@@ -48,13 +48,15 @@ REMOVED_PROGRAM_VARIABLES = {
     "wic": ["wic"],
     "housing": ["housing_assistance", "spm_unit_capped_housing_subsidy"],
 }
-# Spec 9.2: programs that count the UBI as income (not SSI, not Medicaid).
-COUNT_UBI_LISTS = [
-    "gov.usda.snap.income.sources.unearned",
-    "gov.usda.school_meals.income.sources",
-    "gov.usda.wic.income.sources",
-    "gov.hud.annual_income.sources.unearned",
-]
+# Spec 9.2: programs that count the UBI as income (not SSI, not Medicaid),
+# with the UBI variable each one counts (spec v3: programs that end at step 5
+# count the working-age part only; continuing programs phase in the rest).
+COUNT_UBI_LISTS = {
+    "gov.usda.snap.income.sources.unearned": "flatubi_ubi_counted_end",
+    "gov.usda.wic.income.sources": "flatubi_ubi_counted_end",
+    "gov.usda.school_meals.income.sources": "flatubi_ubi_counted_cont",
+    "gov.hud.annual_income.sources.unearned": "flatubi_ubi_counted_cont",
+}
 # 2026 employer share of premiums, used to impute where the data has none
 # (Populace). Rough, from the KFF 2025 employer survey, uprated one year.
 EMPLOYER_PREMIUM_SINGLE = 8_400.0
@@ -140,6 +142,77 @@ def build_reform_v2(p: PolicyV2) -> type[Reform]:
 
         def formula(tax_unit, period, parameters):
             return add(tax_unit, period, ["flatubi_ubi"])
+
+    class flatubi_ubi_working(Variable):
+        """Spec v3 9.2: the working-age part of the UBI: the partial (or full)
+        UBI of adults 18-64 who get it as working-age adults, not as a
+        Social Security floor."""
+
+        value_type = float
+        entity = Person
+        definition_period = YEAR
+        unit = USD
+        label = "Working-age part of the UBI"
+
+        def formula(person, period, parameters):
+            age = person("age", period)
+            working = (age >= adult_age) & (age < senior_age)
+            if p.ss_rule == "floor":
+                working = working & (person("flatubi_ss_full", period) <= 0)
+            return working * person("flatubi_ubi", period)
+
+    class flatubi_ubi_counted_end(Variable):
+        """UBI counted by programs that end at step 5 (SNAP, WIC).
+        v2: all UBI. v3: only the working-age part."""
+
+        value_type = float
+        entity = Person
+        definition_period = YEAR
+        unit = USD
+        label = "UBI counted by SNAP and WIC"
+
+        def formula(person, period, parameters):
+            if p.count_split:
+                return person("flatubi_ubi_working", period)
+            return person("flatubi_ubi", period)
+
+    class flatubi_ubi_counted_cont(Variable):
+        """UBI counted by programs that continue (school meals, housing, ACA).
+        v2: all UBI. v3: the working-age part plus count_share (20% per step)
+        of the child and senior UBI."""
+
+        value_type = float
+        entity = Person
+        definition_period = YEAR
+        unit = USD
+        label = "UBI counted by continuing programs"
+
+        def formula(person, period, parameters):
+            ubi = person("flatubi_ubi", period)
+            if not p.count_split:
+                return ubi
+            working = person("flatubi_ubi_working", period)
+            return working + p.count_share * (ubi - working)
+
+    class flatubi_earnings_exemption(Variable):
+        """Spec v3 4.7: transitional earnings exemption, ages 18-64: wages and
+        net self-employment earnings up to the stage's exemption amount."""
+
+        value_type = float
+        entity = Person
+        definition_period = YEAR
+        unit = USD
+        label = "Transitional earnings exemption"
+
+        def formula(person, period, parameters):
+            age = person("age", period)
+            if p.earnings_exemption <= 0:
+                return 0 * age
+            earnings = person("employment_income", period) + max_(
+                person("self_employment_income", period) + person("sstb_self_employment_income", period), 0
+            )
+            working = (age >= adult_age) & (age < senior_age)
+            return working * min_(max_(earnings, 0), p.earnings_exemption)
 
     class flatubi_employer_health(Variable):
         """Spec 4.2: employer health premiums in the base, phased in by step.
@@ -239,7 +312,11 @@ def build_reform_v2(p: PolicyV2) -> type[Reform]:
         label = "Flat tax base"
 
         def formula(person, period, parameters):
-            return person("flatubi_base_ex_ss", period) + person("flatubi_taxable_social_security", period)
+            return (
+                person("flatubi_base_ex_ss", period)
+                + person("flatubi_taxable_social_security", period)
+                - person("flatubi_earnings_exemption", period)
+            )
 
     class flatubi_flat_tax(Variable):
         """Spec 4.1: flat rate on the person's base, minus the dividend credit
@@ -276,10 +353,14 @@ def build_reform_v2(p: PolicyV2) -> type[Reform]:
             amount = eligible * amount
             if p.eitc_rule == "offset":
                 person = tax_unit.members
-                age = person("age", period)
-                working = (age >= adult_age) & (age < senior_age)
-                partial = tax_unit.sum(person("flatubi_ubi", period) * working)
-                amount = max_(amount - partial, 0)
+                if p.count_split:
+                    # v3: reduced by half of the adults' working-age UBI.
+                    partial = tax_unit.sum(person("flatubi_ubi_working", period))
+                else:
+                    age = person("age", period)
+                    working = (age >= adult_age) & (age < senior_age)
+                    partial = tax_unit.sum(person("flatubi_ubi", period) * working)
+                amount = max_(amount - p.eitc_offset_share * partial, 0)
             return amount
 
     class flat_tax(Variable):
@@ -300,6 +381,10 @@ def build_reform_v2(p: PolicyV2) -> type[Reform]:
         flatubi_ss_full,
         flatubi_ubi,
         basic_income,
+        flatubi_ubi_working,
+        flatubi_ubi_counted_end,
+        flatubi_ubi_counted_cont,
+        flatubi_earnings_exemption,
         flatubi_employer_health,
         total_unemployment_compensation,
         flatubi_dividend_credit,
@@ -323,7 +408,7 @@ def build_reform_v2(p: PolicyV2) -> type[Reform]:
             label = "ACA-related modified AGI for this tax unit"
 
             def formula(tax_unit, period, parameters):
-                return tax_unit("medicaid_magi", period) + tax_unit("basic_income", period)
+                return tax_unit("medicaid_magi", period) + add(tax_unit, period, ["flatubi_ubi_counted_cont"])
 
         variables.append(aca_magi)
 
@@ -365,11 +450,11 @@ def build_reform_v2(p: PolicyV2) -> type[Reform]:
             start=start, stop=stop, value=p.ssi_limits[1]
         )
         if p.programs_count_ubi:
-            for path in COUNT_UBI_LISTS:
+            for path, var in COUNT_UBI_LISTS.items():
                 node = parameters.get_child(path)
                 sources = list(node(f"{p.year}-01-01"))
-                if "flatubi_ubi" not in sources:
-                    node.update(start=start, stop=stop, value=sources + ["flatubi_ubi"])
+                if var not in sources:
+                    node.update(start=start, stop=stop, value=sources + [var])
         return parameters
 
     class FlatTaxUBIv2(Reform):

@@ -15,6 +15,8 @@ V2_SCENARIOS = (
     "v2_step5",
     "v2_longrun",
 )
+# Spec v3 uses the same stages; the "v3_" names select the v3 rules.
+V3_SCENARIOS = tuple(sc.replace("v2_", "v3_") for sc in V2_SCENARIOS)
 
 
 @dataclass
@@ -42,6 +44,12 @@ class PolicyV2:
     ui_factor: float
     ssi_limits: tuple[float, float]
     raw: dict[str, Any] = field(repr=False, default_factory=dict)
+    # Spec v3 (defaults keep the v2 rules).
+    version: str = "v2"
+    earnings_exemption: float = 0.0     # per person 18-64, this stage
+    eitc_offset_share: float = 1.0      # v2: higher of; v3: 0.5
+    count_split: bool = False           # v3: count working-age and child/senior UBI differently
+    count_share: float = 1.0            # v3: share of child/senior UBI counted by continuing programs
 
     # Attributes the shared output code reads.
     spec = "v2"
@@ -64,14 +72,16 @@ class PolicyV2:
 def resolve_v2(cfg: dict[str, Any], scenario: str | None = None) -> PolicyV2:
     cfg = copy.deepcopy(cfg)
     scenario = scenario or cfg.get("scenario", "v2_phase1")
-    if scenario not in V2_SCENARIOS:
-        raise ValueError(f"Unknown v2 scenario {scenario!r}. Use one of {V2_SCENARIOS}.")
+    if scenario not in V2_SCENARIOS + V3_SCENARIOS:
+        raise ValueError(f"Unknown scenario {scenario!r}. Use one of {V2_SCENARIOS + V3_SCENARIOS}.")
+    version = scenario[:2]
+    stage = scenario.replace("v3_", "v2_")
     ubi = cfg.get("ubi", {})
     tax = cfg.get("tax", {})
     steps = int(ubi.get("steps", 5))
     adult = float(ubi.get("adult_annual", 15960))
-    longrun = scenario == "v2_longrun"
-    step = 0 if scenario == "v2_phase1" else (steps if longrun else int(scenario.removeprefix("v2_step")))
+    longrun = stage == "v2_longrun"
+    step = 0 if stage == "v2_phase1" else (steps if longrun else int(stage.removeprefix("v2_step")))
 
     if step == 0:
         eitc_rule, count, removed, ui = "simple", False, [], 1.0
@@ -87,6 +97,8 @@ def resolve_v2(cfg: dict[str, Any], scenario: str | None = None) -> PolicyV2:
             removed = removed + ["housing"]
 
     rates = tax.get("flat_rate_by_scenario", {})
+    v3 = cfg.get("v3", {})
+    share = min(step / steps, 1.0)
     ssi = cfg.get("ssi", {})
     th = tax.get("social_security_thresholds", [25000, 34000])
     return PolicyV2(
@@ -112,5 +124,10 @@ def resolve_v2(cfg: dict[str, Any], scenario: str | None = None) -> PolicyV2:
         programs_removed=removed,
         ui_factor=ui,
         ssi_limits=(float(ssi.get("asset_limit_individual", 6000)), float(ssi.get("asset_limit_couple", 9000))),
+        version=version,
+        earnings_exemption=float(v3.get("earnings_exemption", 16100)) * (1 - share) if version == "v3" else 0.0,
+        eitc_offset_share=float(v3.get("eitc_offset_share", 0.5)) if version == "v3" else 1.0,
+        count_split=version == "v3",
+        count_share=share if version == "v3" else 1.0,
         raw=cfg,
     )

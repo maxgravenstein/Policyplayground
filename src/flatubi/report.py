@@ -45,7 +45,18 @@ LIMITS = [
 
 
 def v2_text(pol) -> str:
-    if pol.scenario == "v2_phase1":
+    text = _v2_text(pol)
+    if getattr(pol, "version", "v2") == "v3":
+        text = text.replace("Spec v2", "Spec v3") + (
+            f" v3 rules: earnings exemption ${pol.earnings_exemption:,.0f} per worker 18-64; EITC reduced by half "
+            f"of the partial UBI; SNAP and WIC count only the working-age UBI; continuing programs count "
+            f"{100 * pol.count_share:.0f}% of the child and senior UBI."
+        )
+    return text
+
+
+def _v2_text(pol) -> str:
+    if pol.scenario.endswith("_phase1"):
         return ("Spec v2, phase 1: UBI for children and people 65+, floors for Social Security beneficiaries "
                 "(higher of benefit or UBI), Social Security taxed as under current law, simple automatic EITC, "
                 "programs kept, flat tax for all.")

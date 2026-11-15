@@ -82,8 +82,10 @@ OPTIONAL_REFORM_PERSON = [
     "flatubi_employer_health",
     "flatubi_ubi_eligible",
     "flatubi_ss_full",
+    "flatubi_ubi_working",
+    "flatubi_earnings_exemption",
 ]
-OPTIONAL_REFORM_HOUSEHOLD = ["flatubi_simple_eitc", "flatubi_dividend_credit", "flatubi_employer_health", "aca_magi"]
+OPTIONAL_REFORM_HOUSEHOLD = ["flatubi_simple_eitc", "flatubi_dividend_credit", "flatubi_employer_health", "aca_magi", "flatubi_earnings_exemption"]
 
 
 @dataclass

@@ -17,9 +17,9 @@ from pathlib import Path
 import pandas as pd
 
 from flatubi.config import load_config
-from flatubi.config_v2 import V2_SCENARIOS
+from flatubi.config_v2 import V2_SCENARIOS, V3_SCENARIOS
 
-SCENARIO_CHOICES = ["steady_state", "phase1", "custom", *V2_SCENARIOS]
+SCENARIO_CHOICES = ["steady_state", "phase1", "custom", *V2_SCENARIOS, *V3_SCENARIOS]
 from flatubi.run import ROOT
 
 
