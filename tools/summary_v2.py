@@ -1,9 +1,9 @@
 """Collect the stage results into one comparison table (Markdown).
 
 Usage: python tools/summary_v2.py outputs/v2 > outputs/v2/stages.md
-       python tools/summary_v2.py outputs/v3 outputs/v2 > outputs/v3/stages.md
-For each stage, the first directory that has a result for it is used
-(v3 step 5 and the long run have the v2 rules, so they come from v2).
+       python tools/summary_v2.py outputs/v3 > outputs/v3/stages.md
+With several directories, for each stage the first directory that has a
+result for it is used.
 """
 
 import json

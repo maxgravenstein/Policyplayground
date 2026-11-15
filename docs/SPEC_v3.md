@@ -62,7 +62,7 @@ poverty rose 5.1 points at step 1, low- and middle-income single workers lost
 |---|---|---|
 | **Phase 1** | Year 1 = the tax year after passage | Flat tax replaces income and payroll taxes. UBI for children and people 65+. Floors for Social Security beneficiaries. Simple EITC (today's amounts, including the small childless EITC). Earnings exemption of $16,100 per worker **(v3)**. Programs kept. |
 | **Phase 2** | Years 2 to 6 | Partial UBI for adults 18-64 in five equal steps. Programs count the new UBI and shrink; continuing programs phase in counting of the child and senior UBI **(v3)**. EITC reduced by half of the partial UBI **(v3)**. Earnings exemption shrinks 20% per step **(v3)**. Employer health premiums enter the tax base in steps. |
-| Rate ceiling **(v3)** | From step 4 while the trust funds last (about year 11-12) | Flat rate held at 35% by drawing down the OASDI and Medicare HI trust funds (Section 10a). |
+| Rate ceiling **(v3)** | From step 4 while the trust funds last; with employer payroll pass-through the model needs it only from step 5 (Section 12.2) | Flat rate held at 35% by drawing down the OASDI and Medicare HI trust funds (Section 10a). |
 | Safety-check delays | Up to year 8 | At most two one-year delays (Section 10). |
 | **End state** | After the last step | Full UBI for all. SNAP, TANF, WIC and the EITC end. |
 | Long tail | Decades | Legacy Social Security winds down (about 60 years). Housing aid: new vouchers until year 18, then attrition. |

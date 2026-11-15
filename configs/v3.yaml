@@ -2,7 +2,8 @@
 # v3 rules switched on by the "v3_" stage names.
 # Run one stage:  python -m flatubi run --config configs/v3.yaml --scenario v3_phase1
 # Stages: v3_phase1, v3_step1 ... v3_step5 (end of the schedule), v3_longrun
-# Step 5 and the long run have the same rules as in v2.
+# Step 5 and the long run have the same rules as in v2, but this config pays the
+# employer payroll tax to workers as wages (v2.yaml does not).
 # Outputs: outputs/v3/<scenario>_2026/
 spec: v2
 year: 2026
