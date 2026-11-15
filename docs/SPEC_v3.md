@@ -239,7 +239,24 @@ more Social Security taxed than today.
 |---|---|---|
 | CTC | Removed from phase 1. The child UBI ($3,000) replaces it. | Decided |
 | EITC, phase 1 | **Simple automatic EITC**: same purpose and similar amounts as today; earnings from employer wage reports; children from the child UBI register; phase-out on earnings only; paid automatically; no tax return. Not taxed. | Decided |
-| EITC for workers without children, phase 1 **(v3)** | Expanded, for ages 19-64. Proposed parameters, like the 2021 expansion: maximum about $1,500, reached at about $10,000 of earnings, zero at about $21,000. Cost about $10-20B a year. | Decided (parameters proposed) |
+| EITC for workers without children, phase 1 **(v3)** | Expanded: the 2021 expansion, raised for inflation, paid automatically per family. Parameters below. Cost about $15-20B a year (estimate). | Decided |
+
+**Expanded childless EITC parameters (v3, decided 2026-11-15).** Amounts are
+approximate 2026 values, to be set exactly in law, then indexed with the
+poverty guideline formula.
+
+| Parameter | Value |
+|---|---|
+| Ages | 19-64, no student test (the automatic system cannot check student status) |
+| Phase-in rate | 15.3% of earnings |
+| Maximum credit | about $1,800 (the 2021 maximum of $1,502, raised for inflation) |
+| Maximum reached at | about $11,800 of earnings |
+| Phase-out starts | about $14,000 (single); about $7,000 higher for married couples, as today |
+| Phase-out rate | 15.3% |
+| Zero at | about $25,700 (single) |
+| Unit | Family (spouses together), like the rest of the simple EITC |
+| Investment income limit | As today (about $12,000), indexed |
+| Phase 2 | The 50% offset applies; for a single worker the credit is gone by step 2 |
 | EITC, phase 2 **(v3)** | Net EITC = max(simple EITC - 0.5 x the partial UBI of all adults 18-64 in the tax unit, 0). Each step adds about $3,192 of UBI per adult and removes only half of it from the EITC, so working families gain about $1,600 per adult per step. A single parent's EITC reaches zero around step 4; a couple's around step 3. | Decided |
 | EITC, end state | Gone. No cliff: the step 5 UBI increase is larger than any EITC left after step 4. | Decided |
 
@@ -519,10 +536,6 @@ Security removed in the steady state).
 ---
 
 ## 13. Open items
-
-To confirm **(v3)**:
-- Parameters of the expanded childless EITC (proposed: maximum about $1,500,
-  ages 19-64, zero at about $21,000) (6).
 
 Left for later:
 1. Cost-of-living fund details (9.3).
