@@ -43,9 +43,9 @@ Every number is in [`config.yaml`](config.yaml).
 
 ## Design
 
-The full policy design, as decided after the first runs, is in
-[`docs/SPEC_v2.md`](docs/SPEC_v2.md). The model code does not yet follow all of
-it; Section 14 of that document lists the gaps.
+The current policy design is [`docs/SPEC_v3.md`](docs/SPEC_v3.md). The model
+follows spec v2 ([`docs/SPEC_v2.md`](docs/SPEC_v2.md)); Section 14 of spec v3
+lists the code changes still needed for v3.
 [`docs/TAX_CODE_MEASURE.md`](docs/TAX_CODE_MEASURE.md) measures how much of the
 Internal Revenue Code the design removes (scripts in `tools/`).
 
