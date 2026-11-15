@@ -536,15 +536,23 @@ From `outputs/v2/SUMMARY.md`. Revenue-neutral flat rate by stage:
 SPM poverty (baseline 13.7%): 14.9% in phase 1, 15.0% at step 1, 6.1% at the
 end of the schedule, 6.5% in the long run.
 
-### 12.2 Estimated effect of the v3 changes (not modeled)
+### 12.2 Model results for v3 (Populace data, static, 2026 population)
 
-| Change | Estimate |
-|---|---|
-| Child and senior UBI not counted by SNAP, TANF, WIC; phased in elsewhere | SNAP stays larger in steps 1-4 (about $30-40B at step 1); about +0.15-0.2 points of rate at step 1 |
-| 50% EITC offset | EITC about $40B at step 1 instead of $16B, then falling fast; about +0.1 point at step 1 |
-| Childless EITC expansion | Dropped; would have cost about $15-20B a year |
-| Trust fund ceiling | Holds 35% from step 4 to about year 11-12; debt +$2.4-2.7T; interest +$90-100B a year |
-| Transitional earnings exemption | About $620B in phase 1 (phase 1 rate about 26% to 29%), falling 20% per step to $0 at step 5 |
+From `outputs/v3/SUMMARY.md`. Step 5 and the long run have the same rules as
+v2.
+
+| | Phase 1 | Step 1 | Step 2 | Step 3 | Step 4 | Step 5 | Long run |
+|---|---|---|---|---|---|---|---|
+| Rate, v3 | 29.76% | 31.45% | 33.06% | 34.61% | 36.05% | 36.99% | 34.06% |
+| SPM poverty, v3 (baseline 13.7%) | 11.2% | 9.8% | 8.2% | 6.9% | 5.8% | 6.1% | 6.5% |
+
+Compared with the estimates made before the run: the exemption costs about
+3.7 points of rate in phase 1 (estimate: about 3); SNAP at step 1 is $73B
+(estimate: $30-40B more than v2's $41B); the EITC at step 1 is $37B (estimate:
+about $40B). The rate is above the 35% ceiling only at step 4 (by 1.1 points,
+about $210B) and step 5 (by 2.0 points, about $415B). New finding: poverty
+rises from 5.8% at step 4 to 6.1% at step 5, when SNAP, WIC, the EITC and the
+last part of the exemption end together (see Section 13).
 
 ### 12.3 Estimates from the v2 discussion
 
@@ -582,6 +590,10 @@ Left for later:
 6. How the affordable housing money is split among states (today's
    Low-Income Housing Tax Credit formula, per person, is the simple default)
    (8.4, 9.3).
+7. The step 5 bump (model result, 12.2): poverty rises from 5.8% to 6.1% and
+   child poverty 1.7 points, because SNAP, WIC, the EITC and the last part of
+   the exemption end in the same year. Options: end SNAP and WIC in year 7,
+   or cut them in two steps; or keep a small exemption to year 7.
 
 ---
 
@@ -615,13 +627,14 @@ One-year snapshots (2026 population, static):
 
 ### 14.3 Status of the model
 
-The v2 model (`src/flatubi/reform/v2.py`, `configs/v2.yaml`) implements spec
-v2 for phase 1, the five phase 2 steps and the long run, except: TANF, child
+The model (`src/flatubi/reform/v2.py`) implements spec v2 (`configs/v2.yaml`,
+stages `v2_*`) and spec v3 (`configs/v3.yaml`, stages `v3_*`) for phase 1, the
+five phase 2 steps and the long run, except: TANF, child
 care, Head Start and LIHEAP counting the UBI; SSDI family members and taper;
 the 5-year wait; Medicare for everyone 65+. Employer health premiums are
 imputed on Populace.
 
-### 14.4 Code changes needed for v3
+### 14.4 Code changes for v3 (done)
 
 | Area | v2 model | v3 |
 |---|---|---|

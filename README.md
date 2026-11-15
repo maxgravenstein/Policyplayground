@@ -11,7 +11,8 @@ It answers three questions:
 The model is **static and annual**. People do not change behavior, unless you
 turn on the rough behavior module (`behavior.enabled`).
 
-**Current results (spec v2, all stages):** [`outputs/v2/SUMMARY.md`](outputs/v2/SUMMARY.md).
+**Current results (spec v3, all stages):** [`outputs/v3/SUMMARY.md`](outputs/v3/SUMMARY.md).
+Spec v2 results: [`outputs/v2/SUMMARY.md`](outputs/v2/SUMMARY.md).
 Earlier results for the original spec: [`outputs/SUMMARY.md`](outputs/SUMMARY.md) (Enhanced CPS) and
 [`outputs/populace/SUMMARY.md`](outputs/populace/SUMMARY.md) (Populace).
 
@@ -44,8 +45,8 @@ Every number is in [`config.yaml`](config.yaml).
 ## Design
 
 The current policy design is [`docs/SPEC_v3.md`](docs/SPEC_v3.md). The model
-follows spec v2 ([`docs/SPEC_v2.md`](docs/SPEC_v2.md)); Section 14 of spec v3
-lists the code changes still needed for v3.
+runs spec v3 (`configs/v3.yaml`) and spec v2 (`configs/v2.yaml`,
+[`docs/SPEC_v2.md`](docs/SPEC_v2.md)).
 [`docs/TAX_CODE_MEASURE.md`](docs/TAX_CODE_MEASURE.md) measures how much of the
 Internal Revenue Code the design removes (scripts in `tools/`).
 
@@ -71,6 +72,7 @@ python -m flatubi compare --configs a.yaml b.yaml
 python -m flatubi baseline-check --config config.yaml       # 5.2 totals only
 python -m flatubi report --scenario phase1                  # rebuild report from the saved run
 python -m flatubi run --config configs/populace.yaml --scenario phase1   # Populace data
+python -m flatubi run --config configs/v3.yaml --scenario v3_step3        # spec v3 stage
 python -m flatubi run --config configs/v2.yaml --scenario v2_step3        # spec v2 stage
 python -m flatubi run --config config.yaml --flat-rate 0.33 --output-name test   # one-off rate
 ```
