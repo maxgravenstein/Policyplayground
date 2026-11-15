@@ -12,6 +12,8 @@ The model is **static and annual**. People do not change behavior, unless you
 turn on the rough behavior module (`behavior.enabled`).
 
 **Current results (spec v3, all stages):** [`outputs/v3/SUMMARY.md`](outputs/v3/SUMMARY.md).
+The v3 runs pay the employer payroll tax to workers as wages (the model
+default, `employer_payroll_to_wages`).
 Spec v2 results: [`outputs/v2/SUMMARY.md`](outputs/v2/SUMMARY.md).
 Earlier results for the original spec: [`outputs/SUMMARY.md`](outputs/SUMMARY.md) (Enhanced CPS) and
 [`outputs/populace/SUMMARY.md`](outputs/populace/SUMMARY.md) (Populace).

@@ -1,0 +1,9 @@
+item,unit,model,published,gap_pct,flag,source
+federal_income_tax,$ billions,2595.30290204217,2751.0,-5.659654596794985,,"CBO, The Budget and Economic Outlook: 2026 to 2036 (Feb 2026), individual income taxes, FY2026"
+payroll_taxes,$ billions,1713.4648480848798,1826.0,-6.162932744530131,,"CBO, Feb 2026 baseline, payroll taxes, FY2026 (includes unemployment insurance taxes and railroad retirement)"
+social_security,$ billions,1677.8738924559807,1670.0,0.4714905662263889,,"2026 OASDI Trustees Report: cost 5.3% of GDP in 2026 (2025 actual cost $1,609B)"
+snap,$ billions,95.05720747944257,90.0,5.619119421602853,,CBPP: FY2026 SNAP spending was 10.3% (about $11B) below FY2025; CBO assumed a 6% drop
+eitc,$ billions,70.00125648913412,70.0,0.0017949844773162177,,"IRS EITC statistics, tax year 2024: about 24 million claims, $69.6B"
+adults,million people,267.7382700191098,270.0,-0.8376777707000774,,"Census Bureau national projections, 2026 (about 344 million people, 21% under 18)"
+children,million people,77.94767724210365,73.0,6.777640057676234,,"Census Bureau national projections, 2026"
+spm_poverty_rate,% of people,13.74799888891472,13.1,4.946556403929167,,"Census Bureau, Poverty in the United States: 2025 (P60-290, Sept 2026), SPM rate for 2025"

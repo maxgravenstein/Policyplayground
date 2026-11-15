@@ -1,30 +1,31 @@
 group,item,baseline,reform,difference
 Revenue,Federal income tax,2595.3,0.0,-2595.3
 Revenue,"Payroll taxes (employee, employer, self-employment)",1713.5,0.0,-1713.5
-Revenue,Flat tax (before the dividend credit),0.0,6563.2,6563.2
+Revenue,Flat tax (before the dividend credit),0.0,6830.8,6830.8
 Revenue,Minus owner credit for business tax on dividends,0.0,-100.5,-100.5
 Revenue,Business tax at 21% (outside the microsimulation),336.0,336.0,0.0
 Revenue,"Employer insurance premium (SSDI above the UBI, unemployment top-up)",0.0,0.0,0.0
 Spending,UBI (gross),0.0,2345.3,2345.3
-Spending,Simple EITC,0.0,8.1,8.1
-Spending,SNAP,95.1,41.4,-53.6
-Spending,TANF,5.2,5.2,0.0
-Spending,WIC,11.7,11.3,-0.4
-Spending,Housing assistance,5.8,3.0,-2.8
-Spending,ACA premium tax credits,145.3,123.8,-21.5
+Spending,Simple EITC,0.0,7.5,7.5
+Spending,SNAP,95.1,39.0,-56.0
+Spending,TANF,5.2,5.0,-0.2
+Spending,WIC,11.7,11.0,-0.7
+Spending,Housing assistance,5.8,2.9,-2.9
+Spending,ACA premium tax credits,145.3,122.8,-22.5
 Spending,Unemployment insurance,42.1,42.1,0.0
 Spending,Social Security,1677.9,1677.9,0.0
-Spending,SSI,57.0,59.5,2.5
+Spending,SSI,57.0,58.9,1.9
 Spending,Medicaid,,,
-Spending,CHIP,12.3,12.4,0.1
-Spending,Medicare,946.0,945.8,-0.2
-Spending,School meals,37.1,31.6,-5.5
-Total,Total revenue,4644.8,6798.7,2153.9
-Total,Total spending,3035.4,5307.5,2272.1
-Total,Net budget effect (revenue minus spending),1609.4,1491.2,-118.2
+Spending,CHIP,12.3,12.0,-0.3
+Spending,Medicare,946.0,945.2,-0.8
+Spending,School meals,37.1,30.8,-6.3
+Total,Total revenue,4644.8,7066.3,2421.5
+Total,Total spending,3035.4,5300.2,2264.9
+Total,Net budget effect (revenue minus spending),1609.4,1766.1,156.7
 Memo,EITC and CTC (baseline: inside income tax),228.9,0.0,-228.9
-Memo,State and local income tax (not in net budget),577.3,581.9,4.6
+Memo,State and local income tax (not in net budget),577.3,616.3,39.0
 Memo,Employer health premiums in the flat tax base,0.0,744.0,744.0
-Memo,Taxable Social Security in the flat tax base,0.0,538.4,538.4
-Memo,Earnings exemption (removed from the flat tax base),0.0,1036.1,1036.1
-Memo,"Net transfer: UBI minus flat tax, where positive",0.0,877.0,877.0
+Memo,Taxable Social Security in the flat tax base,0.0,542.8,542.8
+Memo,Earnings exemption (removed from the flat tax base),0.0,1037.8,1037.8
+Memo,Employer payroll tax paid out as wages,0.0,785.8,785.8
+Memo,"Net transfer: UBI minus flat tax, where positive",0.0,858.7,858.7

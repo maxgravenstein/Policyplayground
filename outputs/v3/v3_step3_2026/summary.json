@@ -1,11 +1,11 @@
 {
   "scenario": "v3_step3",
   "year": 2026,
-  "flat_rate": 0.3461265563964844,
-  "revenue_neutral_rate": 0.3461265563964844,
+  "flat_rate": 0.3322029113769531,
+  "revenue_neutral_rate": 0.3322029113769531,
   "solver_converged": true,
-  "net_budget_billions": 0.1,
-  "net_transfer_billions": 872.0,
+  "net_budget_billions": 0.0,
+  "net_transfer_billions": 865.0,
   "meta": {
     "versions": {
       "policyengine-us": "2.107.4",
@@ -18,10 +18,10 @@
     "data_revision": "populace-us-2024-spm-20260909",
     "data_year": 2024,
     "year": 2026,
-    "seconds": 1454,
+    "seconds": 1428,
     "mtr": false,
     "employer_health_in_data": false,
-    "rate_override": 0.3461265563964844,
+    "rate_override": 0.3322029113769531,
     "poverty_at_rate": 0.34,
     "poverty_recomputed": true,
     "poverty_check_mismatch": 0.0

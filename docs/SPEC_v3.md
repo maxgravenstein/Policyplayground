@@ -25,7 +25,7 @@ poverty rose 5.1 points at step 1, low- and middle-income single workers lost
 | 2 | Phase 2 EITC: reduced by **half** of the partial UBI of the tax unit's adults, instead of "higher of". | 6 |
 | 3 | Phase 1: the EITC for workers without children stays at today's amounts. An expansion was considered and dropped once the earnings exemption (6) was added. | 6 |
 | 4 | Inheritance revenue and the savings from the 5-year wait are not counted in the rate schedule. They are a cushion against behavior risk. | 10, 14 |
-| 5 | The OASDI and Medicare HI trust funds are drawn down to hold the flat rate at a **35% ceiling** from step 4 while the reserves last (about year 11-12). The extra debt and its interest are stated. The safety check uses the planned drawdown. | 5.2, 10, 10a |
+| 5 | The OASDI and Medicare HI trust funds are drawn down to hold the flat rate at a **35% ceiling** from step 4 while the reserves last. With employer payroll pass-through, the model needs the ceiling only from step 5 (12.2). The extra debt and its interest are stated. The safety check uses the planned drawdown. | 5.2, 10, 10a |
 | 6 | **Transitional earnings exemption:** the first $16,100 of each working-age person's wages and self-employment earnings is not taxed in phase 1; the exemption shrinks 20% per step as the partial UBI grows, and ends at step 5. This removes most of the phase 1 squeeze on workers. | 4.7, 6 |
 
 ---
@@ -154,6 +154,11 @@ are indexed to the sale date with the UBI index. **Decided.**
 Employee and employer Social Security and Medicare taxes and self-employment
 tax are removed. Replaced by the employer insurance premium (Section 7.3) and
 the flat tax. **Decided.**
+
+The employer part (6.2% up to the wage cap, plus 1.45%) goes to workers as
+higher pay. This follows CBO, JCT and Treasury: workers carry this tax today,
+in lower pay. The model pays it out in full in the first year ($786B in 2026).
+**Modeling assumption.**
 
 ---
 
@@ -491,10 +496,10 @@ except in schools that serve free meals to all pupils.
 |---|---|---|
 | Ceiling | The flat rate is set at no more than **35%** from step 4, while the reserves last | Decided |
 | Source | Draw down the OASDI trust fund (about $2.4 trillion at passage) and the Medicare HI trust fund (roughly $200-300 billion), which lose their payroll taxes | Decided |
-| How long (estimate) | At the end of the schedule one point of rate is worth about $210B a year. Holding 35% instead of about 37% costs about $400B a year. The reserves last until about **year 11-12**. To be confirmed with the multi-year spreadsheet. | Estimate |
+| How long (estimate) | With employer payroll pass-through (4.6), the model rate is below 35% at step 4 (34.7%) and above it only at step 5 (35.6%). One point of rate is worth about $215B a year there, so the drawdown is about $135B in the first year, then less each year. The reserves are not at risk from the ceiling alone; the multi-year spreadsheet must confirm this with the new legacy benefits of workers who retire in the transition. | Estimate |
 | After the reserves run out | The ceiling ends; the rate is set for revenue neutrality. Legacy benefits shrink slowly and workers who retire during the transition add new legacy benefits (UBI + 40%), so the rate may stay above 35% for some years. | Decided |
-| Debt | Federal debt held by the public rises by about the amount drawn down (about $2.4-2.7 trillion), with roughly $90-100 billion a year of extra interest paid to the public. The law states this. | Decided |
-| Not possible | A permanent 34% ceiling: at about $600B a year it would exhaust the reserves around year 9 | - |
+| Debt | Federal debt held by the public rises by about the amount drawn down (at most about $2.4-2.7 trillion, if the reserves are used up), with up to roughly $90-100 billion a year of extra interest paid to the public. The law states this. | Decided |
+| Not possible | A permanent 34% ceiling: at about $600B a year it would exhaust the reserves around year 9. This estimate is from before pass-through (4.6); with pass-through a 34% ceiling costs about $350B in the first year at step 5. Check again with the multi-year spreadsheet. | - |
 
 ---
 
@@ -538,21 +543,27 @@ end of the schedule, 6.5% in the long run.
 
 ### 12.2 Model results for v3 (Populace data, static, 2026 population)
 
-From `outputs/v3/SUMMARY.md`. Step 5 and the long run have the same rules as
-v2.
+From `outputs/v3/SUMMARY.md`. All stages are v3 runs, with the employer
+payroll tax paid to workers as pay (Section 4.6).
 
 | | Phase 1 | Step 1 | Step 2 | Step 3 | Step 4 | Step 5 | Long run |
 |---|---|---|---|---|---|---|---|
-| Rate, v3 | 29.76% | 31.45% | 33.06% | 34.61% | 36.05% | 36.99% | 34.06% |
-| SPM poverty, v3 (baseline 13.7%) | 11.2% | 9.8% | 8.2% | 6.9% | 5.8% | 6.1% | 6.5% |
+| Rate | 28.39% | 30.06% | 31.67% | 33.22% | 34.66% | 35.62% | 32.78% |
+| Rate without pass-through | 29.76% | 31.45% | 33.06% | 34.61% | 36.05% | 36.99% | 34.06% |
+| SPM poverty (baseline 13.7%) | 10.1% | 8.7% | 7.4% | 6.2% | 5.0% | 5.3% | 5.7% |
+| Deciles that gain on average | 4 | 5 | 5 | 6 | 6 | 6 | 5 |
 
-Compared with the estimates made before the run: the exemption costs about
-3.7 points of rate in phase 1 (estimate: about 3); SNAP at step 1 is $73B
-(estimate: $30-40B more than v2's $41B); the EITC at step 1 is $37B (estimate:
-about $40B). The rate is above the 35% ceiling only at step 4 (by 1.1 points,
-about $210B) and step 5 (by 2.0 points, about $415B). New finding: poverty
-rises from 5.8% at step 4 to 6.1% at step 5, when SNAP, WIC, the EITC and the
-last part of the exemption end together (see Section 13).
+Findings:
+- Pass-through lowers the rate about 1.4 points and poverty about 1 point at
+  every stage.
+- Deciles 1-4 gain in phase 1; deciles 1-5 gain from step 1.
+- Five of six family types do not lose on average at any stage. Only 65+
+  households lose (-2.0% in phase 1, -8.1% at step 4). Within them, the
+  bottom two fifths gain; the middle fifth loses 3-8% and the top two fifths
+  5-15%.
+- The rate is above the 35% ceiling only at step 5 (by 0.6 points, about
+  $135B).
+- Poverty rises from 5.0% at step 4 to 5.3% at step 5 (see Section 13).
 
 ### 12.3 Estimates from the v2 discussion
 
@@ -590,8 +601,8 @@ Left for later:
 6. How the affordable housing money is split among states (today's
    Low-Income Housing Tax Credit formula, per person, is the simple default)
    (8.4, 9.3).
-7. The step 5 bump (model result, 12.2): poverty rises from 5.8% to 6.1% and
-   child poverty 1.7 points, because SNAP, WIC, the EITC and the last part of
+7. The step 5 bump (model result, 12.2): poverty rises from 5.0% to 5.3% and
+   child poverty 1.3 points, because SNAP, WIC, the EITC and the last part of
    the exemption end in the same year. Options: end SNAP and WIC in year 7,
    or cut them in two steps; or keep a small exemption to year 7.
 
@@ -643,6 +654,7 @@ imputed on Populace.
 | Childless EITC, phase 1 | Today's childless EITC (PolicyEngine) | No change |
 | Earnings exemption | None | Per person 18-64: subtract min(earnings, exemption) from the flat tax base; exemption = $16,100 x (1 - step/5); earnings = wages + net self-employment income |
 | Rate ceiling | Not modeled | Outside the one-year model: report each stage's gap to 35% as the planned trust fund drawdown |
+| Employer payroll tax | Saving kept out of household income | Paid to workers as pay (`employer_payroll_to_wages: true`, the model default; `configs/v2.yaml` sets false to keep the v2 results) |
 
 ### 14.5 Original order of work
 
