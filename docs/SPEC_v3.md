@@ -23,9 +23,10 @@ poverty rose 5.1 points at step 1, low- and middle-income single workers lost
 |---|---|---|
 | 1 | Programs that end at step 5 (SNAP, TANF, WIC) count only the new working-age UBI. Programs that continue count the working-age UBI, and phase in the child and senior UBI at 20% per step. | 9.1, 9.2 |
 | 2 | Phase 2 EITC: reduced by **half** of the partial UBI of the tax unit's adults, instead of "higher of". | 6 |
-| 3 | Phase 1: the simple EITC for workers without children is expanded. Middle-income single workers accept a squeeze until step 1. | 6 |
+| 3 | Phase 1: the simple EITC for workers without children is expanded. | 6 |
 | 4 | Inheritance revenue and the savings from the 5-year wait are not counted in the rate schedule. They are a cushion against behavior risk. | 10, 14 |
 | 5 | The OASDI and Medicare HI trust funds are drawn down to hold the flat rate at a **35% ceiling** from step 4 while the reserves last (about year 11-12). The extra debt and its interest are stated. The safety check uses the planned drawdown. | 5.2, 10, 10a |
+| 6 | **Transitional earnings exemption:** the first $16,100 of each working-age person's wages and self-employment earnings is not taxed in phase 1; the exemption shrinks 20% per step as the partial UBI grows, and ends at step 5. This removes most of the phase 1 squeeze on workers. | 4.7, 6 |
 
 ---
 
@@ -36,7 +37,8 @@ poverty rose 5.1 points at step 1, low- and middle-income single workers lost
 2. **One rate, taxed once.** All personal income pays one flat rate. Business
    profit pays 21% at the business and the rest of the flat rate at the owner,
    with a credit, so it is taxed once.
-3. **No carve-outs.** No deductions for people; for businesses, only credits
+3. **No carve-outs.** No deductions for people (except the temporary earnings
+   exemption of Section 4.7, which ends at step 5); for businesses, only credits
    that prevent double tax, reduce negative externalities, or fund research.
    Exceptions kept on purpose: 529-like savings accounts (education, ABLE,
    Coverdell, children's accounts) and tax-exempt state and local bonds.
@@ -58,8 +60,8 @@ poverty rose 5.1 points at step 1, low- and middle-income single workers lost
 
 | Period | Years after passage | What happens |
 |---|---|---|
-| **Phase 1** | Year 1 = the tax year after passage | Flat tax replaces income and payroll taxes. UBI for children and people 65+. Floors for Social Security beneficiaries. Simple EITC, expanded for workers without children **(v3)**. Programs kept. |
-| **Phase 2** | Years 2 to 6 | Partial UBI for adults 18-64 in five equal steps. Programs count the new UBI and shrink; continuing programs phase in counting of the child and senior UBI **(v3)**. EITC reduced by half of the partial UBI **(v3)**. Employer health premiums enter the tax base in steps. |
+| **Phase 1** | Year 1 = the tax year after passage | Flat tax replaces income and payroll taxes. UBI for children and people 65+. Floors for Social Security beneficiaries. Simple EITC, expanded for workers without children **(v3)**. Earnings exemption of $16,100 per worker **(v3)**. Programs kept. |
+| **Phase 2** | Years 2 to 6 | Partial UBI for adults 18-64 in five equal steps. Programs count the new UBI and shrink; continuing programs phase in counting of the child and senior UBI **(v3)**. EITC reduced by half of the partial UBI **(v3)**. Earnings exemption shrinks 20% per step **(v3)**. Employer health premiums enter the tax base in steps. |
 | Rate ceiling **(v3)** | From step 4 while the trust funds last (about year 11-12) | Flat rate held at 35% by drawing down the OASDI and Medicare HI trust funds (Section 10a). |
 | Safety-check delays | Up to year 8 | At most two one-year delays (Section 10). |
 | **End state** | After the last step | Full UBI for all. SNAP, TANF, WIC and the EITC end. |
@@ -97,7 +99,7 @@ poverty rose 5.1 points at step 1, low- and middle-income single workers lost
 | Rate | One rate on all personal income. Set in law for each year of the schedule so that each step is revenue-neutral on paper. | Decided |
 | Rate path (estimate only) | About 24% in phase 1, rising about 2 points per phase 2 step to the high 30s. Must be costed (Section 14). | Estimate |
 | Unit | Each person on their own income (individual filing) | Decided |
-| Deductions and credits | None, except: the simple EITC during the transition (Section 6) and the business tax credit (Section 8) | Decided |
+| Deductions and credits | None, except: the simple EITC during the transition (Section 6), the transitional earnings exemption (Section 4.7, v3) and the business tax credit (Section 8) | Decided |
 | Collection | Withheld at source on wages and other payments | Decided |
 
 ### 4.2 Tax base
@@ -154,6 +156,37 @@ tax are removed. Replaced by the employer insurance premium (Section 7.3) and
 the flat tax. **Decided.**
 
 ---
+
+### 4.7 Transitional earnings exemption (v3)
+
+Phase 1 removes today's standard deduction and lower brackets from working-age
+adults one year before their UBI starts. The exemption replaces them with a
+deduction for earnings that shrinks as the UBI grows. **Decided** (2026-11-15).
+
+| Item | Rule | Status |
+|---|---|---|
+| Who | Each person aged 18-64 (individual, like the flat tax) | Decided |
+| What is exempt | Earnings only: wages and net self-employment earnings, the same rule for both. Not investment income, pensions or Social Security. | Decided |
+| Amount, phase 1 | **$16,100** (about today's standard deduction for a single filer), indexed | Decided |
+| Phase 2 | Shrinks 20% per step as the partial UBI rises 20% per step: about $12,900 at step 1, $9,700 at step 2, $6,400 at step 3, $3,200 at step 4, **$0 from step 5** | Decided |
+| How it works | The flat tax applies to earnings above the exemption. It is not refundable: it can only reduce the tax on earnings to zero. | Decided |
+| Social Security tax rule | "Other income" in Section 5.3 uses earnings **before** the exemption, as current law uses income before the standard deduction | Decided |
+| Withholding, wages | The primary employer applies the exemption monthly (like a W-4 today). Other employers withhold at the flat rate. An automatic year-end adjustment from wage reports settles people with several jobs; no return needed. | Decided |
+| Self-employed | Applied in quarterly estimated payments, settled at year end | Decided |
+
+Worker support grows at every step, so no step is a cliff:
+
+| | Phase 1 | Step 1 | Step 2 | Step 3 | Step 4 | Step 5 |
+|---|---|---|---|---|---|---|
+| Earnings exemption | $16,100 | $12,900 | $9,700 | $6,400 | $3,200 | $0 |
+| Partial UBI | $0 | $3,192 | $6,384 | $9,576 | $12,768 | $15,960 |
+
+Estimated effect (not modeled): costs about $620B in phase 1, falling to $0 at
+step 5. The phase 1 rate rises from about 26% to about 29%, and the rate path
+rises more gently to the 35% ceiling. A single worker's phase 1 loss: from
+about -$3,300 to about -$200 at $20,000; from about -$4,100 to about -$300 at
+$30,000; low earners gain. Higher-income households and retirees with
+investment income pay the higher phase 1 rate without the exemption.
 
 ## 5. Social Security
 
@@ -260,16 +293,18 @@ poverty guideline formula.
 | EITC, phase 2 **(v3)** | Net EITC = max(simple EITC - 0.5 x the partial UBI of all adults 18-64 in the tax unit, 0). Each step adds about $3,192 of UBI per adult and removes only half of it from the EITC, so working families gain about $1,600 per adult per step. A single parent's EITC reaches zero around step 4; a couple's around step 3. | Decided |
 | EITC, end state | Gone. No cliff: the step 5 UBI increase is larger than any EITC left after step 4. | Decided |
 
-**Phase 1 single workers (v3).** Phase 1 has no deduction and no lower
-bracket, so single workers without children pay the flat rate from the first
-dollar. The expanded childless EITC **softens** the loss for the lowest
-earners (nearly all of it below about $12,000, about half at $15,000, little
-above $20,000). Middle-income single workers accept a squeeze **until step 1**
-(longer if the safety check delays step 1). Considered and not adopted:
+**Phase 1 single workers (v3).** Without a deduction or lower bracket, single
+workers without children would pay the flat rate from the first dollar and
+lose 12-17% in phase 1 (v2 model). The **transitional earnings exemption**
+(Section 4.7) removes most of this loss. The expanded childless EITC adds to
+it for the lowest earners. Considered and not adopted:
+- accepting the squeeze until step 1;
 - a low-earner credit refunding the flat tax on the first $15,000 of wages,
-  phased out by $35,000 (full protection; about $60-100B a year);
-- a 6-step schedule that starts the partial UBI in phase 1 (about 1.2-1.5
-  points of rate in year 1).
+  phased out by $35,000 (about $60-100B a year);
+- a middle-earner credit phased out between $25,000 and $60,000 (about
+  $150-200B; adds about 11 points to the marginal rate in that range);
+- a 6-step schedule that starts the partial UBI in phase 1 (about $310B,
+  +1.5 points; pays non-workers, who lose nothing in phase 1).
 
 ---
 
@@ -510,6 +545,7 @@ end of the schedule, 6.5% in the long run.
 | 50% EITC offset | EITC about $40B at step 1 instead of $16B, then falling fast; about +0.1 point at step 1 |
 | Childless EITC expansion | about $10-20B a year in phase 1, then offset by the partial UBI |
 | Trust fund ceiling | Holds 35% from step 4 to about year 11-12; debt +$2.4-2.7T; interest +$90-100B a year |
+| Transitional earnings exemption | About $620B in phase 1 (phase 1 rate about 26% to 29%), falling 20% per step to $0 at step 5 |
 
 ### 12.3 Estimates from the v2 discussion
 
@@ -536,6 +572,11 @@ Security removed in the steady state).
 ---
 
 ## 13. Open items
+
+To decide **(v3)**:
+- With the earnings exemption in place, very low earners already gain in
+  phase 1. Keep the expanded childless EITC (Section 6), or drop it and keep
+  today's small childless EITC (saves about $15-20B a year)?
 
 Left for later:
 1. Cost-of-living fund details (9.3).
@@ -593,6 +634,7 @@ imputed on Populace.
 | Programs counting the UBI | All UBI counted in SNAP, school meals, WIC, housing and ACA from step 1 | Split the UBI into working-age and child/senior parts. SNAP and WIC count the working-age part only; school meals, housing and ACA count the working-age part plus 20% x step of the child/senior part |
 | Phase 2 EITC | max(EITC - adults' partial UBI, 0) | max(EITC - 0.5 x adults' partial UBI, 0) |
 | Childless EITC, phase 1 | Today's childless EITC (PolicyEngine) | Expanded parameters (PolicyEngine has the 2021 expansion parameters) |
+| Earnings exemption | None | Per person 18-64: subtract min(earnings, exemption) from the flat tax base; exemption = $16,100 x (1 - step/5); earnings = wages + net self-employment income |
 | Rate ceiling | Not modeled | Outside the one-year model: report each stage's gap to 35% as the planned trust fund drawdown |
 
 ### 14.5 Original order of work
