@@ -11,7 +11,8 @@ It answers three questions:
 The model is **static and annual**. People do not change behavior, unless you
 turn on the rough behavior module (`behavior.enabled`).
 
-The results are in [`outputs/SUMMARY.md`](outputs/SUMMARY.md) (Enhanced CPS) and
+**Current results (spec v2, all stages):** [`outputs/v2/SUMMARY.md`](outputs/v2/SUMMARY.md).
+Earlier results for the original spec: [`outputs/SUMMARY.md`](outputs/SUMMARY.md) (Enhanced CPS) and
 [`outputs/populace/SUMMARY.md`](outputs/populace/SUMMARY.md) (Populace).
 
 ## The policy
@@ -70,6 +71,7 @@ python -m flatubi compare --configs a.yaml b.yaml
 python -m flatubi baseline-check --config config.yaml       # 5.2 totals only
 python -m flatubi report --scenario phase1                  # rebuild report from the saved run
 python -m flatubi run --config configs/populace.yaml --scenario phase1   # Populace data
+python -m flatubi run --config configs/v2.yaml --scenario v2_step3        # spec v2 stage
 python -m flatubi run --config config.yaml --flat-rate 0.33 --output-name test   # one-off rate
 ```
 

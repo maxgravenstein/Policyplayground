@@ -511,7 +511,15 @@ One-year snapshots (2026 population, static):
 | 529-like accounts | Not in the data | No model change needed |
 | Capital gains basis adjustment for retained business profit | None | Cannot be modeled with the data; note as a limit |
 
-### 14.4 Order of work (when asked)
+### 14.4 Status (2026-11-15)
+
+Done: `src/flatubi/reform/v2.py` and `configs/v2.yaml` model phase 1, the five
+phase 2 steps and the long run. Results: `outputs/v2/SUMMARY.md`. The table in
+14.3 is implemented except: TANF, child care, Head Start and LIHEAP counting
+the UBI; SSDI family members and taper; the 5-year wait; Medicare for
+everyone 65+. Employer health premiums are imputed on Populace.
+
+### 14.5 Original order of work
 
 1. Update the reform code and config to this spec.
 2. Run phase 1, the five phase 2 steps and the end state on Populace data.

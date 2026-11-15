@@ -1,0 +1,29 @@
+group,item,baseline,reform,difference
+Revenue,Federal income tax,2595.3,0.0,-2595.3
+Revenue,"Payroll taxes (employee, employer, self-employment)",1713.5,0.0,-1713.5
+Revenue,Flat tax (before the dividend credit),0.0,7699.2,7699.2
+Revenue,Minus owner credit for business tax on dividends,0.0,-100.5,-100.5
+Revenue,Business tax at 21% (outside the microsimulation),336.0,336.0,0.0
+Revenue,"Employer insurance premium (SSDI above the UBI, unemployment top-up)",0.0,21.1,21.1
+Spending,UBI (gross),0.0,3500.7,3500.7
+Spending,Simple EITC,0.0,0.0,0.0
+Spending,SNAP,95.1,0.0,-95.1
+Spending,TANF,5.2,0.0,-5.2
+Spending,WIC,11.7,0.0,-11.7
+Spending,Housing assistance,5.8,2.0,-3.8
+Spending,ACA premium tax credits,145.3,99.2,-46.1
+Spending,Unemployment insurance,42.1,21.1,-21.1
+Spending,Social Security,1677.9,1677.9,0.0
+Spending,SSI,57.0,59.7,2.7
+Spending,Medicaid,,,
+Spending,CHIP,12.3,12.4,0.1
+Spending,Medicare,946.0,945.9,-0.1
+Spending,School meals,37.1,27.6,-9.4
+Total,Total revenue,4644.8,7955.8,3311.0
+Total,Total spending,3035.4,6346.4,3311.1
+Total,Net budget effect (revenue minus spending),1609.4,1609.4,-0.0
+Memo,EITC and CTC (baseline: inside income tax),228.9,0.0,-228.9
+Memo,State and local income tax (not in net budget),577.3,581.3,4.0
+Memo,Employer health premiums in the flat tax base,0.0,1240.0,1240.0
+Memo,Taxable Social Security in the flat tax base,0.0,543.4,543.4
+Memo,"Net transfer: UBI minus flat tax, where positive",0.0,1204.9,1204.9
