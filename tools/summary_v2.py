@@ -1,6 +1,9 @@
-"""Collect the spec v2 stage results into one comparison table (Markdown).
+"""Collect the stage results into one comparison table (Markdown).
 
 Usage: python tools/summary_v2.py outputs/v2 > outputs/v2/stages.md
+       python tools/summary_v2.py outputs/v3 outputs/v2 > outputs/v3/stages.md
+For each stage, the first directory that has a result for it is used
+(v3 step 5 and the long run have the v2 rules, so they come from v2).
 """
 
 import json
@@ -10,20 +13,21 @@ from pathlib import Path
 import pandas as pd
 
 STAGES = [
-    ("v2_phase1", "Phase 1"),
-    ("v2_step1", "Step 1"),
-    ("v2_step2", "Step 2"),
-    ("v2_step3", "Step 3"),
-    ("v2_step4", "Step 4"),
-    ("v2_step5", "Step 5 (end of schedule)"),
-    ("v2_longrun", "Long run"),
+    ("phase1", "Phase 1"),
+    ("step1", "Step 1"),
+    ("step2", "Step 2"),
+    ("step3", "Step 3"),
+    ("step4", "Step 4"),
+    ("step5", "Step 5 (end of schedule)"),
+    ("longrun", "Long run"),
 ]
 
 
-def load(root: Path, sc: str):
-    d = root / f"{sc}_2026"
-    if not (d / "summary.json").exists():
+def load(roots: list[Path], stage: str):
+    found = [d for root in roots for d in sorted(root.glob(f"v*_{stage}_2026")) if (d / "summary.json").exists()]
+    if not found:
         return None
+    d = found[0]
     s = json.load(open(d / "summary.json"))
     b = pd.read_csv(d / "budget.csv").set_index("item")
     pov = pd.read_csv(d / "poverty.csv").set_index("group")
@@ -49,12 +53,15 @@ def load(root: Path, sc: str):
         "gain_deciles": int((dec["pct_change"] > 0).sum()),
         "senior_pct": age.loc["65+", "pct_change"],
         "base_pov": pov.loc["All people", "poverty_baseline"],
+        "exempt": b.loc["Earnings exemption (removed from the flat tax base)", "reform"]
+        if "Earnings exemption (removed from the flat tax base)" in b.index
+        else 0.0,
     }
 
 
-def main(root):
-    root = Path(root)
-    rows = [(label, load(root, sc)) for sc, label in STAGES]
+def main(roots):
+    roots = [Path(r) for r in roots]
+    rows = [(label, load(roots, sc)) for sc, label in STAGES]
     rows = [(l, r) for l, r in rows if r]
     cols = [l for l, _ in rows]
     lines = ["| | " + " | ".join(cols) + " |", "|---|" + "---|" * len(cols)]
@@ -64,6 +71,7 @@ def main(root):
 
     add("**Revenue-neutral rate**", "rate", lambda v: f"**{v:.2f}%**")
     add("UBI cost ($B)", "ubi", lambda v: f"{v:,.0f}")
+    add("Earnings exempted from the flat tax ($B)", "exempt", lambda v: f"{v:,.0f}")
     add("Simple EITC ($B)", "eitc", lambda v: f"{v:,.0f}")
     add("Social Security paid ($B)", "ss", lambda v: f"{v:,.0f}")
     add("SNAP ($B)", "snap", lambda v: f"{v:,.0f}")
@@ -82,4 +90,4 @@ def main(root):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(sys.argv[1:])
