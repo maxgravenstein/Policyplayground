@@ -37,6 +37,7 @@ tax:
   # Unscaled imputation (single $8,400, family 2.6x) gives $1,857B on Populace
   # in 2026; scale to the Enhanced CPS total of $1,240B: 1240 / 1857.2.
   employer_health_impute_scale: 0.6677
+  employer_payroll_to_wages: false   # false reproduces the published v2 results (outputs/v2); the model default is true
 
 ssi:
   asset_limit_individual: 6000

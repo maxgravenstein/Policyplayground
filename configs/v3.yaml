@@ -39,6 +39,7 @@ tax:
   # Unscaled imputation (single $8,400, family 2.6x) gives $1,857B on Populace
   # in 2026; scale to the Enhanced CPS total of $1,240B: 1240 / 1857.2.
   employer_health_impute_scale: 0.6677
+  employer_payroll_to_wages: true   # employer payroll tax saved goes to workers as pay (CBO/JCT incidence)
 
 v3:
   earnings_exemption: 16100     # phase 1; shrinks 20% per step, 0 at step 5 (spec v3 4.7)

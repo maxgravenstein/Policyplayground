@@ -194,6 +194,53 @@ def build_reform_v2(p: PolicyV2) -> type[Reform]:
             working = person("flatubi_ubi_working", period)
             return working + p.count_share * (ubi - working)
 
+    class flatubi_payroll_passthrough(Variable):
+        """Employer payroll tax paid out as wages (incidence assumption).
+
+        The reform ends the employer Social Security and Medicare tax. CBO,
+        JCT and Treasury assume workers bear that tax through lower pay, so
+        the saving goes to each worker as higher wages: today's employer tax
+        on the worker's wages before the change. Config:
+        tax.employer_payroll_to_wages (default true)."""
+
+        value_type = float
+        entity = Person
+        definition_period = YEAR
+        unit = USD
+        label = "Employer payroll tax paid out as wages"
+
+        def formula(person, period, parameters):
+            if not p.payroll_to_wages:
+                return 0 * person("age", period)
+            wages = person("employment_income_before_lsr", period) + person(
+                "employment_income_behavioral_response", period
+            )
+            gross = max_(0, wages - person("fica_pre_tax_contributions", period))
+            pay = parameters(period).gov.irs.payroll
+            return pay.social_security.rate.employer * min_(pay.social_security.cap, gross) + (
+                pay.medicare.rate.employer * gross
+            )
+
+    class employment_income(Variable):
+        """Wages including the employer payroll tax paid out as wages."""
+
+        value_type = float
+        entity = Person
+        definition_period = YEAR
+        unit = USD
+        label = "employment income"
+
+        def formula(person, period, parameters):
+            return add(
+                person,
+                period,
+                [
+                    "employment_income_before_lsr",
+                    "employment_income_behavioral_response",
+                    "flatubi_payroll_passthrough",
+                ],
+            )
+
     class flatubi_earnings_exemption(Variable):
         """Spec v3 4.7: transitional earnings exemption, ages 18-64: wages and
         net self-employment earnings up to the stage's exemption amount."""
@@ -394,7 +441,10 @@ def build_reform_v2(p: PolicyV2) -> type[Reform]:
         flatubi_flat_tax,
         flatubi_simple_eitc,
         flat_tax,
+        flatubi_payroll_passthrough,
     ]
+    if p.payroll_to_wages:
+        variables.append(employment_income)
 
     if p.programs_count_ubi:
 

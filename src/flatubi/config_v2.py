@@ -50,6 +50,7 @@ class PolicyV2:
     eitc_offset_share: float = 1.0      # v2: higher of; v3: 0.5
     count_split: bool = False           # v3: count working-age and child/senior UBI differently
     count_share: float = 1.0            # v3: share of child/senior UBI counted by continuing programs
+    payroll_to_wages: bool = True       # employer payroll tax saved goes to workers as pay
 
     # Attributes the shared output code reads.
     spec = "v2"
@@ -129,5 +130,6 @@ def resolve_v2(cfg: dict[str, Any], scenario: str | None = None) -> PolicyV2:
         eitc_offset_share=float(v3.get("eitc_offset_share", 0.5)) if version == "v3" else 1.0,
         count_split=version == "v3",
         count_share=share if version == "v3" else 1.0,
+        payroll_to_wages=bool(tax.get("employer_payroll_to_wages", True)),
         raw=cfg,
     )

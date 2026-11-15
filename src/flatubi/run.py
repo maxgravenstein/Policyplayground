@@ -84,8 +84,16 @@ OPTIONAL_REFORM_PERSON = [
     "flatubi_ss_full",
     "flatubi_ubi_working",
     "flatubi_earnings_exemption",
+    "flatubi_payroll_passthrough",
 ]
-OPTIONAL_REFORM_HOUSEHOLD = ["flatubi_simple_eitc", "flatubi_dividend_credit", "flatubi_employer_health", "aca_magi", "flatubi_earnings_exemption"]
+OPTIONAL_REFORM_HOUSEHOLD = [
+    "flatubi_simple_eitc",
+    "flatubi_dividend_credit",
+    "flatubi_employer_health",
+    "aca_magi",
+    "flatubi_earnings_exemption",
+    "flatubi_payroll_passthrough",
+]
 
 
 @dataclass
@@ -227,15 +235,31 @@ def add_mtr(result: SimResult, path: Path, policy: Policy | None, year: int, iso
     Every worker in the household gets that MTR. People with no wages have
     no MTR. This is close to the per-person MTR for one-earner households;
     for two-earner households it is the average of the two.
+
+    "Change in earnings" is the change in the employer's cost: the $1,000
+    plus the employer payroll tax on it (current law), or plus the employer
+    payroll tax paid out as wages (reform with pass-through). So both sides
+    compare the same thing: what the worker keeps of each extra dollar the
+    employer pays.
     """
     p = result.person
-    wages = p.employment_income.to_numpy()
-    bump = np.where(wages > 0, MTR_DELTA, 0.0)
-    log("    MTR: simulate with wages + $1,000")
-    net2 = _isolated(isolate, "simulate_bumped_net", str(path), policy, year, wages + bump)
     hh = result.household
+    wages = p.employment_income.to_numpy()
+    if "flatubi_payroll_passthrough" in p:
+        wages = wages - p.flatubi_payroll_passthrough.to_numpy()  # wages before the pass-through
+    bump = np.where(wages > 0, MTR_DELTA, 0.0)
+    if policy is None or not getattr(policy, "remove_payroll_tax", True):
+        extra = ["employer_social_security_tax", "employer_medicare_tax"]
+    elif "flatubi_payroll_passthrough" in hh:
+        extra = ["flatubi_payroll_passthrough"]
+    else:
+        extra = []
+    log("    MTR: simulate with wages + $1,000")
+    net2, extra2 = _isolated(isolate, "simulate_bumped_net", str(path), policy, year, wages + bump, extra)
     d_earn = pd.Series(bump).groupby(p.household_id.to_numpy()).sum()
     d_earn = hh.household_id.map(d_earn).fillna(0).to_numpy()
+    if extra:
+        d_earn = d_earn + (extra2 - hh[extra].sum(axis=1).to_numpy())
     d_net = net2 - hh.household_net_income.to_numpy()
     mtr_h = np.where(d_earn > 0, 1 - d_net / np.where(d_earn > 0, d_earn, 1), np.nan)
     hh["mtr"] = mtr_h
@@ -323,13 +347,16 @@ def simulate_frames(path: str, policy: Policy | None, year: int, isolate: bool =
     return main
 
 
-def simulate_bumped_net(path: str, policy: Policy | None, year: int, wages: np.ndarray) -> np.ndarray:
-    """Household net income with wages set to `wages` (for the MTR)."""
+def simulate_bumped_net(path: str, policy: Policy | None, year: int, wages: np.ndarray, extra=()):
+    """Household net income, and the household sum of the `extra`
+    variables, with wages before the pass-through set to `wages` (for the MTR)."""
     from policyengine_us import Microsimulation
 
     sim = Microsimulation(dataset=path, reform=_reform_class(policy))
     sim.set_input("employment_income_before_lsr", year, wages)
-    return _calc(sim, "household_net_income", year, map_to="household")
+    net = _calc(sim, "household_net_income", year, map_to="household")
+    total = sum((_calc(sim, v, year, map_to="household") for v in extra), np.zeros_like(net))
+    return net, total
 
 
 def _child_to_file(fn_name: str, args: tuple, out: str) -> None:
@@ -408,7 +435,7 @@ def _baseline_cache_key(path: Path, year: int, mtr: bool) -> str:
         "mtr": mtr,
         "versions": package_versions(),
         "variables": HOUSEHOLD_VARIABLES + PERSON_VARIABLES,
-        "schema": 4,
+        "schema": 5,  # 5: MTR on the employer's cost (includes employer payroll tax)
     }
     return hashlib.sha1(json.dumps(info, sort_keys=True).encode()).hexdigest()[:12]
 

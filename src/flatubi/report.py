@@ -81,6 +81,14 @@ V2_LIMITS = [
     ("Poverty at any rate.", "In spec v2 nothing but the flat tax depends on the rate, so SPM resources are "
      "recomputed exactly at the revenue-neutral rate (checked against PolicyEngine at the run rate)."),
 ]
+V2_PAYROLL = {
+    True: ("Employer payroll tax.", "The reform ends it. Workers get the saving as higher wages (the usual CBO and JCT "
+           "assumption), in full and at once. In real life pay may take a few years to adjust. The higher wages are in "
+           "the flat tax base and count as earnings for benefits."),
+    False: ("Employer payroll tax.", "The reform ends it, but the saving does not go to workers as higher pay "
+            "(config: tax.employer_payroll_to_wages: false). Household net income therefore falls in total by about "
+            "the size of that tax."),
+}
 
 
 def limits(res, tables) -> list[tuple[str, str]]:
@@ -88,7 +96,8 @@ def limits(res, tables) -> list[tuple[str, str]]:
     meta = res.meta
     out = list(LIMITS)
     if getattr(res.policy, "spec", "v1") == "v2":
-        out = out + V2_LIMITS
+        out = [item for item in out if item[0] != "Employer payroll tax."]
+        out = out + V2_LIMITS + [V2_PAYROLL[bool(getattr(res.policy, "payroll_to_wages", False))]]
     label = meta.get("dataset_label") or "Enhanced CPS 2024 (policyengine-us-data tag 1.115.3)"
     data_txt = f"{label}, survey year 2024, aged to {meta.get('year')} by PolicyEngine. Baseline totals differ from published totals; see the checks table."
     if "Enhanced CPS" in label:
@@ -384,7 +393,7 @@ def render_html(res, tables, solve) -> str:
         md = tables["mtr_decile"]
         m = tables["_frames"]["mtr"]
         parts += [
-            "<p class='note'>Effective MTR on earnings for workers with wages: we rerun the simulation with every worker's wages $1,000 higher, and MTR = 1 - (change in household net income) / (change in household wages). All workers in a household share that MTR. Includes federal, state and payroll taxes and the phase-out of benefits counted in net income. Medicaid is not in net income, so Medicaid cliffs do not show.</p>",
+            "<p class='note'>Effective MTR on earnings for workers with wages: we rerun the simulation with every worker's wages $1,000 higher, and MTR = 1 - (change in household net income) / (change in the employer's cost: the $1,000 plus the employer payroll tax on it today, or plus the payroll tax paid out as wages in the reform). All workers in a household share that MTR. Includes federal, state and payroll taxes (both employee and employer parts) and the phase-out of benefits counted in net income. Medicaid is not in net income, so Medicaid cliffs do not show.</p>",
             f"<div class='chart'><img alt='MTR by decile' src='{chart_two_series(md.decile, md.mtr_baseline, md.mtr_reform, 'Income decile', 'Average MTR (%)', ref=(100 * pol.flat_rate, 'flat rate'))}'></div>",
             _fmt_table(md),
             "<h3>MTR curve by earnings</h3>",

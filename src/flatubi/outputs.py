@@ -797,6 +797,7 @@ def budget_table_v2(res: RunResult, rounded: bool = True) -> pd.DataFrame:
         ("Memo", "Employer health premiums in the flat tax base", 0.0, float((p.weight * p.get("flatubi_employer_health", 0)).sum())),
         ("Memo", "Taxable Social Security in the flat tax base", 0.0, float((p.weight * p.get("flatubi_taxable_social_security", 0)).sum())),
         ("Memo", "Earnings exemption (removed from the flat tax base)", 0.0, float((p.weight * p.get("flatubi_earnings_exemption", 0)).sum())),
+        ("Memo", "Employer payroll tax paid out as wages", 0.0, float((p.weight * p.get("flatubi_payroll_passthrough", 0)).sum())),
         ("Memo", "Net transfer: UBI minus flat tax, where positive", 0.0, net_transfer(res)),
     ]
     df = pd.concat([df, pd.DataFrame(totals + memo, columns=df.columns)], ignore_index=True)
