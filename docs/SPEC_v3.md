@@ -183,10 +183,21 @@ Worker support grows at every step, so no step is a cliff:
 
 Estimated effect (not modeled): costs about $620B in phase 1, falling to $0 at
 step 5. The phase 1 rate rises from about 26% to about 29%, and the rate path
-rises more gently to the 35% ceiling. A single worker's phase 1 loss: from
-about -$3,300 to about -$200 at $20,000; from about -$4,100 to about -$300 at
-$30,000; low earners gain. Higher-income households and retirees with
-investment income pay the higher phase 1 rate without the exemption.
+rises more gently to the 35% ceiling. A single worker without children,
+compared with today (corrected 2026-11-15):
+
+| Earnings | Phase 1 without the exemption (26%) | With the exemption (29%) |
+|---|---|---|
+| $10,000 | about -$1,800 | about +$770 |
+| $15,000 | about -$2,500 | about +$1,150 |
+| $20,000 | about -$3,300 | about +$790 |
+| $30,000 | about -$4,100 | about -$320 |
+| $50,000 | about -$5,400 | about -$2,200 |
+
+Workers up to about $25,000 gain; the remaining losses are around
+$40,000-60,000 (about -4% to -6%) and are mostly covered at step 1.
+Higher-income households and retirees with investment income pay the higher
+phase 1 rate without the exemption.
 
 ## 5. Social Security
 
